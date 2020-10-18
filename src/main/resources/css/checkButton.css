@@ -1,0 +1,21 @@
+.check-box:selected .box {
+    -fx-background-color:#545454 ;
+	        -fx-mark-highlight-color:white; 
+        -fx-mark-color:white;
+}
+
+.check-box .box {
+    -fx-background-color:#545454 ;
+        -fx-mark-highlight-color:white; 
+        -fx-mark-color:white;
+}
+
+.check-box:focused .box {
+  -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+    -fx-background-radius: 2, 2, 1, 1;
+}
+
+.check-box .box {
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+    -fx-background-radius: 2, 2, 1, 1;
+}

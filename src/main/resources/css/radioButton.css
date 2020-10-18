@@ -1,0 +1,28 @@
+.radio-button:pressed:hover {
+	-fx-background-color: transparent;
+	    -fx-scale-y: 1;
+    -fx-scale-x: 1;
+}
+
+.radio-button .radio:selected {
+    -fx-background-color: transparent;
+	    -fx-scale-y: 1;
+    -fx-scale-x: 1;
+}
+.radio-button:focused {
+	-fx-focus-color: transparent; 
+    -fx-scale-y: 1;
+    -fx-scale-x: 1;
+ 	}
+
+
+.radio-button .radio { 
+    -fx-scale-y: 1;
+    -fx-scale-x: 1;
+}
+.radio-button .radio:pressed { 
+
+    -fx-scale-y: 1;
+    -fx-scale-x: 1;
+}
+
