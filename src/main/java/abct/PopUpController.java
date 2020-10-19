@@ -65,7 +65,6 @@ public class PopUpController extends AbstractController implements Initializable
             popupStage.setTitle("ERROR");
             popupStage.initStyle(StageStyle.UNDECORATED);
             popupStage.setOpacity(0.85);
-            System.out.println("show n wait");
             popupStage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();

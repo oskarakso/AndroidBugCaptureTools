@@ -1,6 +1,7 @@
 package abct;
 
 import abct.adb_tools.InstallApk;
+import abct.scrcpy.Scrcpy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -35,7 +36,7 @@ import static abct.adb_tools.getDevices.getDevicesList;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 public class MainViewController extends AbstractController implements Initializable {
-    boolean isStarted = false;
+    public boolean isStarted = false;
     protected Map<String, String> devices;
     private String scrcpyLocation = null;
 
@@ -60,15 +61,12 @@ public class MainViewController extends AbstractController implements Initializa
     @FXML
     public ComboBox<String> combo_box1;
 
-    //TODO: Add scrcpy class
-    // Process process = new ProcessBuilder("C:\\Users\\User\\Downloads\\scrcpy-win64-v1.12.1\\scrcpy-noconsole.exe", "-s " +  getDevice()).start();
-
     @FXML
     private void apkInstall() throws IOException {
-        if (null == combo_box1.getValue() || combo_box1.isDisabled() || combo_box1.getValue().contains("No device")) {
-            showPopup("Missing device");
+        if (null == getDevice()) {
+            showPopup("No device selected!");
         } else if (null == apkPickerTextBox.getText() || apkPickerTextBox.getText().equals("")) {
-            showPopup("Missing apk file location");
+            showPopup("Missing apk file location!");
         } else {
             InstallApk installApk = new InstallApk(this);
             Thread t1 = new Thread(installApk);
@@ -77,27 +75,24 @@ public class MainViewController extends AbstractController implements Initializa
     }
 
     @FXML
-    private void scrcpyLocationSelector() {
-        this.scrcpyLocation = folderSelector();
-    }
-
-    @FXML
     private void scrcpyLaunch() {
-        //todo: add device checker or add popup to getDevice exception?
-        if (null == scrcpyLocation){
-            showPopup("Missing scrcpy folder location!");
-        } else{
-            try {
-                //to fix, returns folder location rather than scrcpy..
-                Process process = new ProcessBuilder(scrcpyLocation, "-s " +  getDevice()).start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            showPopup("Error");
-            }
+        if (null == getDevice()) {
+            showPopup("No device selected!");
+        } else if (null == getScrcpyLocation()) {
+            showPopup("Missing scrcpy exe \n file location!");
+        } else {
+            Scrcpy scrcpy = new Scrcpy(this);
+            scrcpy.runScrcpy();
         }
     }
 
-    private void showPopup(String text){
+    @FXML
+    private void scrcpyLocationSelector() {
+        this.scrcpyLocation = fileSelector("exe");
+    }
+
+
+    protected void showPopup(String text) {
         PopUpController popUpController = new PopUpController();
         popUpController.showPopupWindow(text);
     }
@@ -106,23 +101,18 @@ public class MainViewController extends AbstractController implements Initializa
         DirectoryChooser directoryChooser = new DirectoryChooser();
         File selectedDirectory = directoryChooser.showDialog(main.getPrimaryStage());
         directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        try {
-            return selectedDirectory.toString();
-        } catch (Exception ignored) {
-        }
-        return null;
+        return selectedDirectory.toString();
     }
 
-    private String fileSelector() {
+    private String fileSelector(String fileType) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("APK", "*.apk"));
-        File selectedFile = fileChooser.showOpenDialog(main.getPrimaryStage());
-        try {
-            return selectedFile.toString();
-        } catch (Exception ignored) {
+        switch (fileType) {
+            case "apk" -> fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("APK", "*.apk"));
+            case "exe" -> fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("EXE", "*.exe"));
         }
-        return null;
+        File selectedFile = fileChooser.showOpenDialog(main.getPrimaryStage());
+        return selectedFile.toString();
     }
 
 
@@ -134,7 +124,7 @@ public class MainViewController extends AbstractController implements Initializa
 
     @FXML
     private void openFileSelector() {
-        apkPickerTextBox.setText(fileSelector());
+        apkPickerTextBox.setText(fileSelector("apk"));
         alignmentDoinger(apkPickerTextBox);
     }
 
@@ -157,10 +147,9 @@ public class MainViewController extends AbstractController implements Initializa
 
     @FXML
     private void closeApp() {
-        //TODO: ADD BLOCKER IF INSTALL IN PROGRESS
-        if (isStarted) {
+        if (isStarted || apkInstall.isDisabled()) {
             showPopup("SERVICE IS RUNNING\n" +
-                    "PLEASE STOP BEFORE CLOSING");
+                    "PLEASE STOP BEFORE CLOSING!");
         } else {
             Platform.exit();
             System.exit(0);
@@ -240,7 +229,13 @@ public class MainViewController extends AbstractController implements Initializa
     }
 
     public String getDevice() {
-        return combo_box1.getValue().split("-", 2)[0];
+        if (null == combo_box1.getValue() || combo_box1.isDisabled() || combo_box1.getValue().contains("No device")) {
+            return null;
+        } else
+            return combo_box1.getValue().split("-", 2)[0];
     }
 
+    public String getScrcpyLocation() {
+        return scrcpyLocation;
+    }
 }
