@@ -80,12 +80,12 @@
       </Button>
       <Text fx:id="focus_loser" layoutX="10.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" />
       <CheckBox layoutX="37.0" layoutY="622.0" mnemonicParsing="false" stylesheets="@css/checkButton.css" text="Use folder with date" textFill="WHITE" />
-      <TextField fx:id="apkPickerTextBox" alignment="CENTER" focusTraversable="false" layoutX="36.0" layoutY="178.0" onMouseClicked="#apkPickerTextBoxClick" onMouseExited="#apkPickerTextBoxUnHover" prefHeight="36.0" prefWidth="141.0" promptText="Select .apk file" stylesheets="@css/folderPickerTextBox.css">
+      <TextField fx:id="apkPickerTextBox" alignment="CENTER" focusTraversable="false" layoutX="36.0" layoutY="222.0" onMouseClicked="#apkPickerTextBoxClick" onMouseExited="#apkPickerTextBoxUnHover" prefHeight="36.0" prefWidth="141.0" promptText="Select .apk file" stylesheets="@css/folderPickerTextBox.css">
          <font>
             <Font name="Calibri" size="12.0" />
          </font>
       </TextField>
-      <Button fx:id="ApkPickerButton" layoutX="178.0" layoutY="176.0" mnemonicParsing="false" onAction="#openFileSelector" prefHeight="39.0" prefWidth="47.0" stylesheets="@css/folderPickerButton.css">
+      <Button fx:id="ApkPickerButton" layoutX="178.0" layoutY="220.0" mnemonicParsing="false" onAction="#openFileSelector" prefHeight="39.0" prefWidth="47.0" stylesheets="@css/folderPickerButton.css">
          <graphic>
             <ImageView fitHeight="51.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -94,16 +94,26 @@
             </ImageView>
          </graphic>
       </Button>
-      <Text fill="WHITE" layoutX="37.0" layoutY="158.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Install apk" textAlignment="CENTER" wrappingWidth="141.0">
+      <Text fill="WHITE" layoutX="37.0" layoutY="202.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Install apk" textAlignment="CENTER" wrappingWidth="141.0">
          <font>
             <Font size="22.0" />
          </font>
       </Text>
-      <Button fx:id="apkInstall" layoutX="37.0" layoutY="219.0" mnemonicParsing="false" onAction="#apkInstall" prefHeight="17.0" prefWidth="55.0" stylesheets="@css/buttonNormal.css" text="Install" textAlignment="CENTER" />
-      <TextField fx:id="apkInstallResult" alignment="CENTER" editable="false" focusTraversable="false" layoutX="99.0" layoutY="220.0" mouseTransparent="true" onMouseClicked="#apkPickerTextBoxClick" onMouseExited="#apkPickerTextBoxUnHover" prefHeight="27.0" prefWidth="78.0" promptText="Result" stylesheets="@css/folderPickerTextBox.css">
+      <Button fx:id="apkInstall" layoutX="37.0" layoutY="263.0" mnemonicParsing="false" onAction="#apkInstall" prefHeight="17.0" prefWidth="55.0" stylesheets="@css/buttonNormal.css" text="Install" textAlignment="CENTER" />
+      <TextField fx:id="apkInstallResult" alignment="CENTER" editable="false" focusTraversable="false" layoutX="99.0" layoutY="264.0" mouseTransparent="true" onMouseClicked="#apkPickerTextBoxClick" onMouseExited="#apkPickerTextBoxUnHover" prefHeight="27.0" prefWidth="78.0" promptText="Result" stylesheets="@css/folderPickerTextBox.css">
          <font>
             <Font name="Calibri" size="12.0" />
          </font>
       </TextField>
+      <Button fx:id="scrcpyButton" layoutX="108.0" layoutY="118.0" mnemonicParsing="false" onAction="#scrcpyLaunch" prefHeight="27.0" prefWidth="95.0" stylesheets="@css/buttonNormal.css" text="Open scrcpy" textAlignment="CENTER" />
+      <Button fx:id="scrCpyFolderPicker" layoutX="52.0" layoutY="112.0" mnemonicParsing="false" onAction="#scrcpyLocationSelector" prefHeight="39.0" prefWidth="47.0" stylesheets="@css/folderPickerButton.css">
+         <graphic>
+            <ImageView fitHeight="51.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@images/folder.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
    </children>
 </AnchorPane>

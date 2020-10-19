@@ -49,7 +49,9 @@ public class InstallApk extends MainViewController implements Runnable {
                 if (line.toLowerCase().contains("success")) {
                     setAs("pass");
                     return;
-                }
+                } //else  {
+                   // System.out.println(line); - uncomment to see cmd logs
+               // }
             }
         }
         setAs("fail");
