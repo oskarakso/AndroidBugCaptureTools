@@ -1,0 +1,15 @@
+.text-field, .text-field:focused {
+    -fx-background-color:  #545454 ;
+    -fx-text-fill: white ;
+    -fx-font-family: "Calibri" ;
+	-fx-font-size: 14;
+}
+
+.combo-box:editable .arrow-button {
+	-fx-background-color:  #545454 ;
+}
+
+.combo-box:editable .list-view {
+    -fx-text-fill: white ;
+    -fx-background-color: #545454 ;
+}

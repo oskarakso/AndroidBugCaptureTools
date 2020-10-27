@@ -61,6 +61,19 @@ public class MainViewController extends AbstractController implements Initializa
     @FXML
     public ComboBox<String> combo_box1;
 
+
+    /*
+    @FXML
+    private void x(){
+    }
+     TODO:
+     - disable package list if no device selected
+     - disable buttons underneath
+     - Click on list -> Refresh (or if slow or smth, add button)
+     - Click on button -> If succesfull -> Set text as "Done!" wait for few sec (3) -> set back to default text (get it before - pass as arg.)
+     - think about adding run button to run app "adb shell am start -p package.name 1"
+     */
+
     @FXML
     private void apkInstall() throws IOException {
         if (null == getDevice()) {

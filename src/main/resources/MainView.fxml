@@ -115,5 +115,11 @@
             </ImageView>
          </graphic>
       </Button>
+      <ComboBox fx:id="packageListComboBox" editable="true" layoutX="37.0" layoutY="346.0" prefHeight="36.0" prefWidth="186.0" promptText="No package selected" style="-fx-background-color: #545454; -fx-border-color: transparent; -fx-color: #545454; -fx-focus-color: transparent;" stylesheets="@css/combobox_Editable.css" />
+      <Text fill="WHITE" layoutX="21.0" layoutY="334.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Package Manager" textAlignment="CENTER" wrappingWidth="212.0">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Text>
    </children>
 </AnchorPane>
