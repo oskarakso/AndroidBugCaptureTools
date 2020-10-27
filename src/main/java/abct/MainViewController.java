@@ -70,7 +70,7 @@ public class MainViewController extends AbstractController implements Initializa
      - disable package list if no device selected
      - disable buttons underneath
      - Click on list -> Refresh (or if slow or smth, add button)
-     - Click on button -> If succesfull -> Set text as "Done!" wait for few sec (3) -> set back to default text (get it before - pass as arg.)
+     - Click on button -> If succesfull -> Set text as "Done!" wait for few sec (3) -> set back to default text (get it before - pass as arg.) - and maybe implement in install status field
      - think about adding run button to run app "adb shell am start -p package.name 1"
      */
 

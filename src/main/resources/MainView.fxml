@@ -121,5 +121,7 @@
             <Font size="22.0" />
          </font>
       </Text>
+      <Button fx:id="apkUninstall" layoutX="37.0" layoutY="393.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="78.0" stylesheets="@css/buttonNormal.css" text="Uninstall" textAlignment="CENTER" />
+      <Button fx:id="apkClearData" layoutX="128.0" layoutY="393.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="95.0" stylesheets="@css/buttonNormal.css" text="Clear Data" textAlignment="CENTER" />
    </children>
 </AnchorPane>
