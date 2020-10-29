@@ -1,20 +1,15 @@
 package abct;
 
 import abct.adb_tools.InstallApk;
+import abct.adb_tools.PackageManager;
 import abct.scrcpy.Scrcpy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -23,19 +18,16 @@ import javafx.stage.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static abct.adb_tools.getDevices.getDevicesList;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 public class MainViewController extends AbstractController implements Initializable {
+
+
     public boolean isStarted = false;
     protected Map<String, String> devices;
     private String scrcpyLocation = null;
@@ -60,7 +52,48 @@ public class MainViewController extends AbstractController implements Initializa
     private Button close_app;
     @FXML
     public ComboBox<String> combo_box1;
+    @FXML
+    public ComboBox<String> packageListComboBox;
+    @FXML
+    private Button uninstallApk;
+    @FXML
+    private Button apkClearData;
+    @FXML
+    private Button startApk;
+    @FXML
+    private Button closeApk;
 
+    @FXML
+    private void closeApk() {
+        new Thread(() -> {
+            PackageManager pm = new PackageManager(this);
+            pm.closeApk();
+        }).start();
+    }
+
+    @FXML
+    private void uninstallApk() {
+        new Thread(() -> {
+            PackageManager pm = new PackageManager(this);
+            pm.uninstallApp();
+        }).start();
+    }
+
+    @FXML
+    private void openApk() {
+        new Thread(() -> {
+            PackageManager pm = new PackageManager(this);
+            pm.openApk();
+        }).start();
+    }
+
+    @FXML
+    private void clearApkData() {
+        new Thread(() -> {
+            PackageManager pm = new PackageManager(this);
+            pm.clearAppData();
+        }).start();
+    }
 
     /*
     @FXML
@@ -241,6 +274,10 @@ public class MainViewController extends AbstractController implements Initializa
         return apkPickerTextBox.getText();
     }
 
+    public String getPackageName() {
+        return packageListComboBox.getValue();
+    }
+
     public String getDevice() {
         if (null == combo_box1.getValue() || combo_box1.isDisabled() || combo_box1.getValue().contains("No device")) {
             return null;
@@ -250,5 +287,12 @@ public class MainViewController extends AbstractController implements Initializa
 
     public String getScrcpyLocation() {
         return scrcpyLocation;
+    }
+
+    public void packageSectionDisable(Boolean state){
+         uninstallApk.setDisable(state);
+         apkClearData.setDisable(state);
+         startApk.setDisable(state);
+         closeApk.setDisable(state);
     }
 }

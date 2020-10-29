@@ -53,6 +53,16 @@ public class Main extends Application {
             primaryStage.setY(event.getScreenY() - yOffset);
         });
 
+        myControllerHandle.packageListComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            String val = myControllerHandle.packageListComboBox.getValue();
+            if(null!=val && !"".equals(val)){
+            myControllerHandle.packageSectionDisable(false);
+            }else{
+            myControllerHandle.packageSectionDisable(true);
+            }
+
+        });
+
 
         Platform.setImplicitExit(false);
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
