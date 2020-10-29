@@ -2,6 +2,8 @@ package abct;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -53,18 +55,20 @@ public class Main extends Application {
             primaryStage.setY(event.getScreenY() - yOffset);
         });
 
-        myControllerHandle.packageListComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            String val = myControllerHandle.packageListComboBox.getValue();
-            if(null!=val && !"".equals(val)){
-            myControllerHandle.packageSectionDisable(false);
-            }else{
-            myControllerHandle.packageSectionDisable(true);
+        myControllerHandle.packageListComboBox.valueProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                String val = myControllerHandle.packageListComboBox.getValue();
+                if(null!=val && !"".equals(val)){
+                    myControllerHandle.packageSectionDisable(false);
+                }else{
+                    myControllerHandle.packageSectionDisable(true);
+                }
             }
-
         });
 
 
-        Platform.setImplicitExit(false);
+            Platform.setImplicitExit(false);
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {

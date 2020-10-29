@@ -121,9 +121,9 @@
             <Font size="22.0" />
          </font>
       </Text>
-      <Button fx:id="uninstallApk" layoutX="37.0" layoutY="393.0" mnemonicParsing="false" onAction="#uninstallApk" prefHeight="27.0" prefWidth="78.0" stylesheets="@css/buttonNormal.css" text="Uninstall" textAlignment="CENTER" />
-      <Button fx:id="apkClearData" layoutX="128.0" layoutY="393.0" mnemonicParsing="false" onAction="#clearApkData" prefHeight="27.0" prefWidth="95.0" stylesheets="@css/buttonNormal.css" text="Clear Data" textAlignment="CENTER" />
-      <Button fx:id="closeApk" layoutX="37.0" layoutY="427.0" mnemonicParsing="false" onAction="#closeApk" prefHeight="27.0" prefWidth="78.0" stylesheets="@css/buttonNormal.css" text="Close App" textAlignment="CENTER" />
-      <Button fx:id="startApk" layoutX="128.0" layoutY="427.0" mnemonicParsing="false" onAction="#openApk" prefHeight="27.0" prefWidth="95.0" stylesheets="@css/buttonNormal.css" text="Open App" textAlignment="CENTER" />
+      <Button fx:id="uninstallApk" disable="true" layoutX="37.0" layoutY="393.0" mnemonicParsing="false" onAction="#uninstallApk" prefHeight="27.0" prefWidth="78.0" stylesheets="@css/buttonNormal.css" text="Uninstall" textAlignment="CENTER" />
+      <Button fx:id="apkClearData" disable="true" layoutX="128.0" layoutY="393.0" mnemonicParsing="false" onAction="#clearApkData" prefHeight="27.0" prefWidth="95.0" stylesheets="@css/buttonNormal.css" text="Clear Data" textAlignment="CENTER" />
+      <Button fx:id="closeApk" disable="true" layoutX="37.0" layoutY="427.0" mnemonicParsing="false" onAction="#closeApk" prefHeight="27.0" prefWidth="78.0" stylesheets="@css/buttonNormal.css" text="Close App" textAlignment="CENTER" />
+      <Button fx:id="startApk" disable="true" layoutX="128.0" layoutY="427.0" mnemonicParsing="false" onAction="#openApk" prefHeight="27.0" prefWidth="95.0" stylesheets="@css/buttonNormal.css" text="Open App" textAlignment="CENTER" />
    </children>
 </AnchorPane>
