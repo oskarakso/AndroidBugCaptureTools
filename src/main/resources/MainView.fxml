@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="651.0" prefWidth="1024.0" style="-fx-background-color: #121212;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="abct.MainViewController">
+<AnchorPane onMouseClicked="#loseFocus" prefHeight="651.0" prefWidth="1024.0" style="-fx-background-color: #121212;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="abct.MainViewController">
    <children>
       <Button fx:id="start_stop" alignment="CENTER" graphicTextGap="2.0" layoutX="415.0" layoutY="553.0" mnemonicParsing="false" onAction="#start_stop_press" prefHeight="84.0" prefWidth="194.0" style="-fx-background-color: #00b312;" stylesheets="@css/start_stop.css" text="START" textAlignment="CENTER" textFill="#fffefe" textOverrun="CLIP" wrapText="true" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="415.0" AnchorPane.rightAnchor="415.0" AnchorPane.topAnchor="553.0">
          <font>

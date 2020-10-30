@@ -1,6 +1,7 @@
 package abct.adb_tools;
 
 import abct.MainViewController;
+import javafx.geometry.Pos;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -76,16 +77,19 @@ public class InstallApk extends MainViewController implements Runnable {
         switch (s) {
             case "start" -> {
                 mainViewController.apkInstall.setDisable(true);
+                mainViewController.apkInstallResult.setAlignment(Pos.CENTER_LEFT);
                 mainViewController.apkInstallResult.setText("Installing...");
                 mainViewController.apkInstallResult.setStyle("-fx-text-fill: white;");
             }
             case "fail" -> {
                 mainViewController.apkInstall.setDisable(false);
+                mainViewController.apkInstallResult.setAlignment(Pos.CENTER);
                 mainViewController.apkInstallResult.setText("Failed!");
                 mainViewController.apkInstallResult.setStyle("-fx-text-fill: red;");
             }
             case "pass" -> {
                 mainViewController.apkInstall.setDisable(false);
+                mainViewController.apkInstallResult.setAlignment(Pos.CENTER);
                 mainViewController.apkInstallResult.setText("Success!");
                 mainViewController.apkInstallResult.setStyle("-fx-text-fill: green;");
             }

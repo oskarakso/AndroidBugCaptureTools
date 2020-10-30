@@ -137,6 +137,10 @@ public class MainViewController extends AbstractController implements Initializa
         this.scrcpyLocation = fileSelector("exe");
     }
 
+    @FXML
+    private void loseFocus(){
+        focus_loser.requestFocus();
+    }
 
     protected void showPopup(String text) {
         PopUpController popUpController = new PopUpController();

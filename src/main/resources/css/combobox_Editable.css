@@ -13,3 +13,8 @@
     -fx-text-fill: white ;
     -fx-background-color: #545454 ;
 }
+
+.combo-box:editable:focused {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+}
