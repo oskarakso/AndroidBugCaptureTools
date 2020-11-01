@@ -6,6 +6,7 @@ import abct.scrcpy.Scrcpy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -96,15 +97,11 @@ public class MainViewController extends AbstractController implements Initializa
     }
 
     /*
-    @FXML
-    private void x(){
-    }
+
      TODO:
-     - disable package list if no device selected
-     - disable buttons underneath
+
      - Click on list -> Refresh (or if slow or smth, add button)
      - Click on button -> If succesfull -> Set text as "Done!" wait for few sec (3) -> set back to default text (get it before - pass as arg.) - and maybe implement in install status field
-     - think about adding run button to run app "adb shell am start -p package.name 1"
      */
 
     @FXML
@@ -138,7 +135,7 @@ public class MainViewController extends AbstractController implements Initializa
     }
 
     @FXML
-    private void loseFocus(){
+    private void loseFocus() {
         focus_loser.requestFocus();
     }
 
@@ -293,10 +290,32 @@ public class MainViewController extends AbstractController implements Initializa
         return scrcpyLocation;
     }
 
-    public void packageSectionDisable(Boolean state){
-         uninstallApk.setDisable(state);
-         apkClearData.setDisable(state);
-         startApk.setDisable(state);
-         closeApk.setDisable(state);
+    public void packageSectionDisable(Boolean state) {
+        uninstallApk.setDisable(state);
+        apkClearData.setDisable(state);
+        startApk.setDisable(state);
+        closeApk.setDisable(state);
+    }
+
+    public Boolean isDeviceSelected() {
+        if (null == combo_box1.getValue()) {
+            return false;
+        }
+        if ("No devices available".equals(combo_box1.getValue())) {
+            return false;
+        }
+        if ("No device selected".equals(combo_box1.getValue())) {
+            return false;
+        } else
+            return true;
+    }
+
+    public Boolean isPackageSelected() {
+        String val = packageListComboBox.getEditor().textProperty().getValue();
+        if (null != val && !"".equals(val)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -55,20 +56,25 @@ public class Main extends Application {
             primaryStage.setY(event.getScreenY() - yOffset);
         });
 
-        myControllerHandle.packageListComboBox.valueProperty().addListener(new ChangeListener<String>() {
+
+        ///LISTENERS SECTION
+
+        // PACKAGE MANAGER
+        myControllerHandle.packageListComboBox.getEditor().textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
-                String val = myControllerHandle.packageListComboBox.getValue();
-                if(null!=val && !"".equals(val)){
-                    myControllerHandle.packageSectionDisable(false);
-                }else{
-                    myControllerHandle.packageSectionDisable(true);
-                }
+                packageSectionCheck();
+            }
+        });
+        myControllerHandle.combo_box1.valueProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
+                packageSectionCheck();
             }
         });
 
-
-            Platform.setImplicitExit(false);
+        ///EXIT PLATFORM SECTION
+        Platform.setImplicitExit(false);
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
@@ -82,6 +88,13 @@ public class Main extends Application {
                 }
             }
         });
+    }
+
+    public void packageSectionCheck() {
+        if (myControllerHandle.isDeviceSelected() && myControllerHandle.isPackageSelected())
+            myControllerHandle.packageSectionDisable(false);
+        else
+            myControllerHandle.packageSectionDisable(true);
     }
 
     public Stage getPrimaryStage() {
