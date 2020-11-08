@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -72,6 +73,13 @@ public class Main extends Application {
                 packageSectionCheck();
             }
         });
+
+        //alignment after change (by focus) on text-fields
+        myControllerHandle.folderPickerTextBox.focusedProperty().addListener((obs, oldVal, newVal) ->
+                myControllerHandle.alignmentDoinger(myControllerHandle.folderPickerTextBox));
+
+        myControllerHandle.apkPickerTextBox.focusedProperty().addListener((obs, oldVal, newVal) ->
+                myControllerHandle.alignmentDoinger(myControllerHandle.apkPickerTextBox));
 
         ///EXIT PLATFORM SECTION
         Platform.setImplicitExit(false);

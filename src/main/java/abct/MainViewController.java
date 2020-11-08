@@ -28,7 +28,6 @@ import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 public class MainViewController extends AbstractController implements Initializable {
 
-
     public boolean isStarted = false;
     protected Map<String, String> devices;
     private String scrcpyLocation = null;
@@ -99,7 +98,6 @@ public class MainViewController extends AbstractController implements Initializa
     /*
 
      TODO:
-
      - Click on list -> Refresh (or if slow or smth, add button)
      - Click on button -> If succesfull -> Set text as "Done!" wait for few sec (3) -> set back to default text (get it before - pass as arg.) - and maybe implement in install status field
      */
@@ -176,17 +174,6 @@ public class MainViewController extends AbstractController implements Initializa
     }
 
     @FXML
-    private void folderPickerTextBoxUnHover() {
-        focus_loser.requestFocus();
-        alignmentDoinger(folderPickerTextBox);
-    }
-
-    @FXML
-    private void folderPickerTextBoxClick() {
-        alignmentDoinger(folderPickerTextBox);
-    }
-
-    @FXML
     private void minimizeApp() {
         Stage stage = (Stage) minimize.getScene().getWindow();
         stage.setIconified(true);
@@ -223,12 +210,6 @@ public class MainViewController extends AbstractController implements Initializa
     }
 
     @FXML
-    private void apkPickerTextBoxUnHover() {
-        focus_loser.requestFocus();
-        alignmentDoinger(apkPickerTextBox);
-    }
-
-    @FXML
     private void apkPickerTextBoxClick() {
         alignmentDoinger(apkPickerTextBox);
     }
@@ -236,17 +217,17 @@ public class MainViewController extends AbstractController implements Initializa
     public void UpdateDevicesList() {
         // If user disconnect selected device and refresh list
         // there is an empty field but on second click it's not.
-        // No idea wtf if going on and how to fix it, spent too much time already on this :)
+        // No idea wtf if going on and how to fix it, I already spent too much time on this :)
         ObservableList<String> choiceBox = FXCollections.observableArrayList();
         for (Map.Entry<String, String> entry : devices.entrySet()) {
             choiceBox.add(entry.getKey() + " - " + entry.getValue());
         }
         if (choiceBox.size() == 0) {
+            combo_box1.valueProperty().setValue("");
             combo_box1.getSelectionModel().clearSelection();
             combo_box1.setItems(null);
-            combo_box1.valueProperty().setValue("");
-            combo_box1.valueProperty().set("No devices available");
             combo_box1.setDisable(true);
+            combo_box1.valueProperty().set("No devices available");
         } else if (combo_box1.getSelectionModel().getSelectedIndex() == -1) {
             combo_box1.setItems(choiceBox);
             combo_box1.getSelectionModel().clearSelection();

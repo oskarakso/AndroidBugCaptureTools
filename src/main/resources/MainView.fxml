@@ -64,7 +64,7 @@
             </Button>
          </items>
       </ToolBar>
-      <TextField fx:id="folderPickerTextBox" alignment="CENTER" focusTraversable="false" layoutX="37.0" layoutY="582.0" onMouseClicked="#folderPickerTextBoxClick" onMouseExited="#folderPickerTextBoxUnHover" prefHeight="36.0" prefWidth="141.0" promptText="Destination Folder" stylesheets="@css/folderPickerTextBox.css">
+      <TextField fx:id="folderPickerTextBox" alignment="CENTER" focusTraversable="false" layoutX="37.0" layoutY="582.0" prefHeight="36.0" prefWidth="141.0" promptText="Destination Folder" stylesheets="@css/folderPickerTextBox.css">
          <font>
             <Font name="Calibri" size="12.0" />
          </font>
@@ -80,7 +80,7 @@
       </Button>
       <Text fx:id="focus_loser" layoutX="10.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" />
       <CheckBox layoutX="37.0" layoutY="622.0" mnemonicParsing="false" stylesheets="@css/checkButton.css" text="Use folder with date" textFill="WHITE" />
-      <TextField fx:id="apkPickerTextBox" alignment="CENTER" focusTraversable="false" layoutX="36.0" layoutY="222.0" onMouseClicked="#apkPickerTextBoxClick" onMouseExited="#apkPickerTextBoxUnHover" prefHeight="36.0" prefWidth="141.0" promptText="Select .apk file" stylesheets="@css/folderPickerTextBox.css">
+      <TextField fx:id="apkPickerTextBox" alignment="CENTER" focusTraversable="false" layoutX="36.0" layoutY="222.0" prefHeight="36.0" prefWidth="141.0" promptText="Select .apk file" stylesheets="@css/folderPickerTextBox.css">
          <font>
             <Font name="Calibri" size="12.0" />
          </font>
@@ -100,7 +100,7 @@
          </font>
       </Text>
       <Button fx:id="apkInstall" layoutX="37.0" layoutY="263.0" mnemonicParsing="false" onAction="#apkInstall" prefHeight="17.0" prefWidth="55.0" stylesheets="@css/buttonNormal.css" text="Install" textAlignment="CENTER" />
-      <TextField fx:id="apkInstallResult" alignment="CENTER" editable="false" focusTraversable="false" layoutX="99.0" layoutY="264.0" mouseTransparent="true" onMouseClicked="#apkPickerTextBoxClick" onMouseExited="#apkPickerTextBoxUnHover" prefHeight="27.0" prefWidth="78.0" promptText="Result" stylesheets="@css/folderPickerTextBox.css">
+      <TextField fx:id="apkInstallResult" alignment="CENTER" editable="false" focusTraversable="false" layoutX="99.0" layoutY="264.0" mouseTransparent="true" onMouseClicked="#apkPickerTextBoxClick" prefHeight="27.0" prefWidth="78.0" promptText="Result" stylesheets="@css/folderPickerTextBox.css">
          <font>
             <Font name="Calibri" size="12.0" />
          </font>
