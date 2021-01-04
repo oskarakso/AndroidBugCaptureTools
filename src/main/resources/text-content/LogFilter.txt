@@ -1,0 +1,8 @@
+Log output filter
+V: Verbose (lowest priority)
+D: Debug
+I: Info (default)
+W: Warning
+E: Error
+F: Fatal
+S: Silent (highest priority, on which nothing is ever printed)

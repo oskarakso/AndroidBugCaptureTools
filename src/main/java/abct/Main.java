@@ -75,8 +75,11 @@ public class Main extends Application {
         });
 
         //alignment after change (by focus) on text-fields
-        myControllerHandle.folderPickerTextBox.focusedProperty().addListener((obs, oldVal, newVal) ->
-                myControllerHandle.alignmentDoinger(myControllerHandle.folderPickerTextBox));
+        myControllerHandle.destinationFolderPath.focusedProperty().addListener((obs, oldVal, newVal) ->
+                myControllerHandle.alignmentDoinger(myControllerHandle.destinationFolderPath));
+
+        myControllerHandle.logCaptureFileName.focusedProperty().addListener((obs, oldVal, newVal) ->
+                myControllerHandle.alignmentDoinger(myControllerHandle.logCaptureFileName));
 
         myControllerHandle.apkPickerTextBox.focusedProperty().addListener((obs, oldVal, newVal) ->
                 myControllerHandle.alignmentDoinger(myControllerHandle.apkPickerTextBox));

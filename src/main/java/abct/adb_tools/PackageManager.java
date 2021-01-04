@@ -54,8 +54,8 @@ public class PackageManager extends MainViewController implements Runnable {
                 }
             }
         }
-        System.out.println("fail");
-        //setAs("fail");
+        System.out.println("pass");
+        //setAs("pass");
     }
 
     public void closeApk() {

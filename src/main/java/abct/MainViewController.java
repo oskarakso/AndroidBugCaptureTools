@@ -1,12 +1,12 @@
 package abct;
 
 import abct.adb_tools.InstallApk;
+import abct.adb_tools.LogCapture;
 import abct.adb_tools.PackageManager;
 import abct.scrcpy.Scrcpy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,11 +20,11 @@ import javafx.stage.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
+import static abct.adb_tools.LogCapture.*;
 import static abct.adb_tools.getDevices.getDevicesList;
-import static java.util.concurrent.CompletableFuture.supplyAsync;
+
 
 public class MainViewController extends AbstractController implements Initializable {
 
@@ -35,13 +35,13 @@ public class MainViewController extends AbstractController implements Initializa
     @FXML
     private Text focus_loser;
     @FXML
-    public TextField folderPickerTextBox;
+    public TextField destinationFolderPath;
     @FXML
     public TextField apkPickerTextBox;
     @FXML
-    public TextField apkInstallResult;
+    public TextField logCaptureFileName;
     @FXML
-    private Button folderPickerButton;
+    public TextField apkInstallResult;
     @FXML
     private Button start_stop;
     @FXML
@@ -49,7 +49,7 @@ public class MainViewController extends AbstractController implements Initializa
     @FXML
     public Button apkInstall;
     @FXML
-    private Button close_app;
+    public Button logsClean;
     @FXML
     public ComboBox<String> combo_box1;
     @FXML
@@ -62,6 +62,53 @@ public class MainViewController extends AbstractController implements Initializa
     private Button startApk;
     @FXML
     private Button closeApk;
+    //Log Capture
+    @FXML
+    private ComboBox<String> logCaptureOutputFormat;
+    @FXML
+    private ComboBox<String> logCaptureLevelFilter;
+
+    public static ArrayList<String> installationLogs = new ArrayList<String>();
+
+
+    private String logCaptureOutputFormatDefaultSelection;
+    private String logCaptureLevelFilterDefaultSelection;
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        //Read and set scrcpy location
+        this.scrcpyLocation = Scrcpy.getLocation();
+        //Read and set log formats/filters
+        logCaptureOutputFormat.setItems(getOutputFormat());
+        logCaptureOutputFormat.getSelectionModel().selectFirst();
+        logCaptureOutputFormatDefaultSelection = logCaptureOutputFormat.getValue();
+        logCaptureLevelFilter.setItems(getOutputFilter());
+        logCaptureLevelFilter.getSelectionModel().selectFirst();
+        logCaptureLevelFilterDefaultSelection = logCaptureLevelFilter.getValue();
+    }
+
+    @FXML
+    public void dumpLogs() {
+        new Thread(() -> {
+            LogCapture lc = new LogCapture(this);
+            lc.dumpLogs();
+        }).start();
+    }
+
+    @FXML
+    private void updatePackageList() {
+        //TODO: UPDATE PACKAGE LIST ECT.
+    }
+
+    @FXML
+    private void cleanLogs() {
+        new Thread(() -> {
+            LogCapture lc = new LogCapture(this);
+            lc.cleanLogs();
+        }).start();
+
+    }
 
     @FXML
     private void closeApk() {
@@ -103,10 +150,16 @@ public class MainViewController extends AbstractController implements Initializa
      */
 
     @FXML
-    private void apkInstall() throws IOException {
+    private void showInstallLog() {
+        showLogsPopup();
+    }
+
+    @FXML
+    private void apkInstall() throws InterruptedException {
         if (null == getDevice()) {
             showPopup("No device selected!");
         } else if (null == apkPickerTextBox.getText() || apkPickerTextBox.getText().equals("")) {
+            //TODO: Check if file is .apk or .apex
             showPopup("Missing apk file location!");
         } else {
             InstallApk installApk = new InstallApk(this);
@@ -130,6 +183,7 @@ public class MainViewController extends AbstractController implements Initializa
     @FXML
     private void scrcpyLocationSelector() {
         this.scrcpyLocation = fileSelector("exe");
+        Scrcpy.saveLocation(this.scrcpyLocation);
     }
 
     @FXML
@@ -137,9 +191,19 @@ public class MainViewController extends AbstractController implements Initializa
         focus_loser.requestFocus();
     }
 
-    protected void showPopup(String text) {
+    public void showPopup(String text) {
         PopUpController popUpController = new PopUpController();
         popUpController.showPopupWindow(text);
+    }
+
+    public void showLogsPopup() {
+        // installationLogs.add("11:11:11-12-32-23  DUPA: FATALNY EXCEPTION W MUZGU EHEHEHEH");
+        // installationLogs.add("12:10:18-13-12-03  DUPAS: ALALALALLALALLALALLALLALALLALALALLALALALALLALA");
+        // installationLogs.add("13:14:10-17-22-43  DUPAL: FATALNY EXCEPTION W MUZGU EHEHEHEH");
+        PopUpLogsController popUpLogsController = new PopUpLogsController();
+        popUpLogsController.showPopupWindow(installationLogs);
+        loseFocus();
+        //ADD PASSING THE HASHMAP XD
     }
 
     private String folderSelector() {
@@ -163,8 +227,8 @@ public class MainViewController extends AbstractController implements Initializa
 
     @FXML
     private void openFolderSelector() {
-        folderPickerTextBox.setText(folderSelector());
-        alignmentDoinger(folderPickerTextBox);
+        destinationFolderPath.setText(folderSelector());
+        alignmentDoinger(destinationFolderPath);
     }
 
     @FXML
@@ -209,10 +273,6 @@ public class MainViewController extends AbstractController implements Initializa
         UpdateDevicesList();
     }
 
-    @FXML
-    private void apkPickerTextBoxClick() {
-        alignmentDoinger(apkPickerTextBox);
-    }
 
     public void UpdateDevicesList() {
         // If user disconnect selected device and refresh list
@@ -236,10 +296,6 @@ public class MainViewController extends AbstractController implements Initializa
         } else {
             combo_box1.setItems(choiceBox);
         }
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
     }
 
     public void alignmentDoinger(TextField field) {
@@ -298,5 +354,29 @@ public class MainViewController extends AbstractController implements Initializa
         } else {
             return false;
         }
+    }
+
+    public ComboBox<String> getLogCaptureOutputFormat() {
+        return logCaptureOutputFormat;
+    }
+
+    public ComboBox<String> getLogCaptureLevelFilter() {
+        return logCaptureLevelFilter;
+    }
+
+    public String getLogCaptureOutputFormatDefaultSelection() {
+        return logCaptureOutputFormatDefaultSelection;
+    }
+
+    public String getLogCaptureLevelFilterDefaultSelection() {
+        return logCaptureLevelFilterDefaultSelection;
+    }
+
+    public String getDeviceIdName() {
+        return combo_box1.getValue();
+    }
+
+    public void addLog(String log) {
+        installationLogs.add(log);
     }
 }

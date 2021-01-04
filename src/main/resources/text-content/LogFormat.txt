@@ -1,0 +1,9 @@
+Log output format
+brief: Display priority, tag, and PID of the process issuing the message.
+long: Display all metadata fields and separate messages with blank lines.
+process: Display PID only.
+raw: Display the raw log message with no other metadata fields.
+tag: Display the priority and tag only.
+thread: A legacy format that shows priority, PID, and TID of the thread issuing the message.
+threadtime: (Default) Display the date, invocation time, priority, tag, PID, and TID of the thread issuing the message.
+time: Display the date, invocation time, priority, tag, and PID of the process issuing the message.
