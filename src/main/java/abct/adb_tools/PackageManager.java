@@ -1,11 +1,19 @@
 package abct.adb_tools;
 
 import abct.MainViewController;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static abct.Utils.GlobalTools.combineInputStreams;
 
 public class PackageManager extends MainViewController implements Runnable {
     MainViewController mainViewController;
@@ -159,10 +167,40 @@ public class PackageManager extends MainViewController implements Runnable {
     }
 
 
+    public ObservableList<String> getDevicePackages() {
+        //adb shell pm list packages -3
+        String deviceID = mainViewController.getDevice();
+        String option = "3";
+        String command = "adb -s " + deviceID + " shell pm list packages -" + option;
+        Process process = null;
+
+        try {
+            process = Runtime.getRuntime().exec(command);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        InputStream inStream = process.getInputStream();
+        InputStream erStream = process.getErrorStream();
+        List<String> processOutput = null;
+
+        try {
+            processOutput = combineInputStreams(inStream, erStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ObservableList<String> toReturn = FXCollections.observableArrayList();
+
+        processOutput.forEach((n) -> {
+            String s1 = n.substring(n.indexOf(":") + 1);
+            s1.trim();
+            toReturn.add(s1);
+        });
+
+        return toReturn;
+    }
+
     // TODO:
-
-    // - get package list as HashMap<String>
-    // adb shell pm list packages -3"|cut -f 2 -d ":
-
     // - Animated or just status as text on button for 3sec (after executing -> pass/fail)
 }

@@ -31,12 +31,12 @@ public class GlobalTools {
         BufferedReader reader = new BufferedReader(new InputStreamReader(in1));
         String line = null;
         while ((line = reader.readLine()) != null) {
-            System.out.println(line);
+            //System.out.println(line);
             toReturn.add(line);
             }
         reader = new BufferedReader(new InputStreamReader(in2));
         while ((line = reader.readLine()) != null) {
-            System.out.println(line);
+            //System.out.println(line);
             toReturn.add(line);
         }
         return toReturn;

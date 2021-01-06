@@ -1,5 +1,6 @@
 package abct;
 
+import abct.Utils.GlobalTools;
 import abct.adb_tools.InstallApk;
 import abct.adb_tools.LogCapture;
 import abct.adb_tools.PackageManager;
@@ -11,14 +12,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.*;
+import javafx.util.Callback;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
 
@@ -28,9 +29,12 @@ import static abct.adb_tools.getDevices.getDevicesList;
 
 public class MainViewController extends AbstractController implements Initializable {
 
-    public boolean isStarted = false;
     protected Map<String, String> devices;
     private String scrcpyLocation = null;
+    private String logCaptureOutputFormatDefaultSelection;
+    private String logCaptureLevelFilterDefaultSelection;
+    public boolean isStarted = false;
+    public static ArrayList<String> installationLogs = new ArrayList<String>();
 
     @FXML
     private Text focus_loser;
@@ -68,15 +72,10 @@ public class MainViewController extends AbstractController implements Initializa
     @FXML
     private ComboBox<String> logCaptureLevelFilter;
 
-    public static ArrayList<String> installationLogs = new ArrayList<String>();
-
-
-    private String logCaptureOutputFormatDefaultSelection;
-    private String logCaptureLevelFilterDefaultSelection;
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //checkAdb();
         //Read and set scrcpy location
         this.scrcpyLocation = Scrcpy.getLocation();
         //Read and set log formats/filters
@@ -96,11 +95,36 @@ public class MainViewController extends AbstractController implements Initializa
         }).start();
     }
 
+
     @FXML
     private void updatePackageList() {
-        //TODO: UPDATE PACKAGE LIST ECT.
+        Platform.runLater(
+                () -> {
+                    PackageManager pm = new PackageManager(this);
+                    if (isDeviceSelected()) {
+                        ObservableList<String> packages = pm.getDevicePackages();
+                        if (packages.get(0).contains("not found")) {
+                            showPopup("Device has been disconnected");
+                            this.packageListComboBox.getItems().clear();
+                            try {
+                                refreshDevicesPress();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            this.packageListComboBox.setVisibleRowCount(8);
+                            this.packageListComboBox.setItems(packages);
+                            System.out.println(this.packageListComboBox.getVisibleRowCount());
+                        }
+                    } else {
+                        this.packageListComboBox.hide();
+                    }
+                }
+        );
+        //TODO: ON SHIFT+CLICK OPEN POPUP WITH SELECTION OF PACKAGE TYPE
     }
 
+    //TODO: Where possible: If failed to uninstall -> Add logs
     @FXML
     private void cleanLogs() {
         new Thread(() -> {
@@ -197,31 +221,9 @@ public class MainViewController extends AbstractController implements Initializa
     }
 
     public void showLogsPopup() {
-        // installationLogs.add("11:11:11-12-32-23  DUPA: FATALNY EXCEPTION W MUZGU EHEHEHEH");
-        // installationLogs.add("12:10:18-13-12-03  DUPAS: ALALALALLALALLALALLALLALALLALALALLALALALALLALA");
-        // installationLogs.add("13:14:10-17-22-43  DUPAL: FATALNY EXCEPTION W MUZGU EHEHEHEH");
         PopUpLogsController popUpLogsController = new PopUpLogsController();
         popUpLogsController.showPopupWindow(installationLogs);
         loseFocus();
-        //ADD PASSING THE HASHMAP XD
-    }
-
-    private String folderSelector() {
-        DirectoryChooser directoryChooser = new DirectoryChooser();
-        File selectedDirectory = directoryChooser.showDialog(main.getPrimaryStage());
-        directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        return selectedDirectory.toString();
-    }
-
-    private String fileSelector(String fileType) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        switch (fileType) {
-            case "apk" -> fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("APK", "*.apk"));
-            case "exe" -> fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("EXE", "*.exe"));
-        }
-        File selectedFile = fileChooser.showOpenDialog(main.getPrimaryStage());
-        return selectedFile.toString();
     }
 
 
@@ -268,33 +270,35 @@ public class MainViewController extends AbstractController implements Initializa
     }
 
     @FXML
-    private void refreshDevicesPress(ActionEvent event) throws IOException {
+    private void refreshDevicesPress() throws IOException {
         devices = getDevicesList();
+        System.out.println(devices);
         UpdateDevicesList();
     }
 
 
     public void UpdateDevicesList() {
-        // If user disconnect selected device and refresh list
-        // there is an empty field but on second click it's not.
-        // No idea wtf if going on and how to fix it, I already spent too much time on this :)
-        ObservableList<String> choiceBox = FXCollections.observableArrayList();
+        ObservableList<String> deviceList = FXCollections.observableArrayList();
+
         for (Map.Entry<String, String> entry : devices.entrySet()) {
-            choiceBox.add(entry.getKey() + " - " + entry.getValue());
+            deviceList.add(entry.getKey() + " - " + entry.getValue());
         }
-        if (choiceBox.size() == 0) {
-            combo_box1.valueProperty().setValue("");
-            combo_box1.getSelectionModel().clearSelection();
-            combo_box1.setItems(null);
-            combo_box1.setDisable(true);
-            combo_box1.valueProperty().set("No devices available");
-        } else if (combo_box1.getSelectionModel().getSelectedIndex() == -1) {
-            combo_box1.setItems(choiceBox);
-            combo_box1.getSelectionModel().clearSelection();
-            combo_box1.valueProperty().set("No device selected");
+
+        if (deviceList.size() > 0) {
+            String selectedDevice = combo_box1.getSelectionModel().getSelectedItem();
+            combo_box1.setItems(deviceList);
+            if (deviceList.contains(selectedDevice)) {
+                combo_box1.getSelectionModel().select(selectedDevice);
+            } else {
+                combo_box1.getSelectionModel().selectFirst();
+            }
             combo_box1.setDisable(false);
         } else {
-            combo_box1.setItems(choiceBox);
+            combo_box1.getSelectionModel().clearSelection();
+            combo_box1.getItems().clear();
+            combo_box1.getItems().add("No devices available");
+            combo_box1.getSelectionModel().selectFirst();
+            combo_box1.setDisable(true);
         }
     }
 
@@ -355,6 +359,14 @@ public class MainViewController extends AbstractController implements Initializa
             return false;
         }
     }
+
+    public void checkAdb()  {
+        if (!checkAdbStatus()) {
+            showPopup("NO ADB DETECTED");
+            Platform.exit();
+        }
+    }
+
 
     public ComboBox<String> getLogCaptureOutputFormat() {
         return logCaptureOutputFormat;

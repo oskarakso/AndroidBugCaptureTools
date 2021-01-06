@@ -15,7 +15,3 @@ public class InstallationLogs {
                 "\n";
     }
 }
-//MainViewController.installationLogsMain
-//todo:
-// Additional: Change phones list: Phone = object of a Device class, device name, device id
-// getters setters and all that crap

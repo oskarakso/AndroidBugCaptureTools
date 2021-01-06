@@ -47,6 +47,8 @@ public class Main extends Application {
 
         primaryStage.show();
 
+        mainViewController.checkAdb();
+
         //letting user move app by dragging background
         layout.setOnMousePressed(event -> {
             xOffset = event.getSceneX();
