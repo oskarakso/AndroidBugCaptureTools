@@ -191,13 +191,14 @@ public class PackageManager extends MainViewController implements Runnable {
         }
 
         ObservableList<String> toReturn = FXCollections.observableArrayList();
-
+        //Trimming lines and deleting empty ones (occurred on 6.0.1)
         processOutput.forEach((n) -> {
             String s1 = n.substring(n.indexOf(":") + 1);
             s1.trim();
+            if(!s1.equals("")){
             toReturn.add(s1);
+            }
         });
-
         return toReturn;
     }
 

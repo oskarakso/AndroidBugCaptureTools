@@ -1,0 +1,70 @@
+@FXML -- Javafx has some kind of issue when dynamically adjusting size of VisibleRowCount - Kinda works but ain't perfect due to that
+//    private void updatePackageList() {
+//        this.packageListComboBox.getProperties().put("comboBoxRowsToMeasureWidth", 10);
+//        if (!isDeviceSelected()) {
+//            Platform.runLater(() -> this.packageListComboBox.hide());
+//            return;
+//        }
+//        // App is frozen as long as it's processing - might take some time tbh
+//        // New thread -> Same as with runLater but also throws not on javafx thread error
+//        // New thread & runLater -> Shows clean/old list while waiting for new list
+//        // runLater -> Freezing app while waiting for package list
+//        // Nothing -> Only freezing but visible row count is now working
+//        new Thread(() -> {
+//            Platform.runLater(() -> {
+//                this.packageListComboBox.getItems().removeAll(packageListComboBox.getItems());
+//                System.out.println(this.packageListComboBox.getItems().toString());
+//                        this.packageListComboBox.getEditor().setText("LOADING...");
+//            });
+//            PackageManager pm = new PackageManager(this);
+//        ObservableList<String> packages = pm.getDevicePackages();
+//            if (packages.get(0).contains("not found")) {
+//                showPopup("Device has been disconnected");
+//                this.packageListComboBox.getItems().clear();
+//                refreshDevicesPress();
+//            } else {
+//                Platform.runLater(() -> {
+//                    this.packageListComboBox.setVisibleRowCount(0);
+//                    this.packageListComboBox.setVisibleRowCount(packages.size());
+//                    this.packageListComboBox.getEditor().clear();
+//                    this.packageListComboBox.getItems().setAll(packages);
+//                });
+//            }
+//        }).start();
+//    }
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//  @FXML // Not updating size, javafx is bugged or it's just me (but I'm more likely to say it's javafx:))
+//    private void updatePackageList() {
+//
+//        if (!isDeviceSelected()) {
+//            Platform.runLater(() -> this.packageListComboBox.hide());
+//            return;
+//        }
+//
+//        PackageManager pm = new PackageManager(this);
+//
+//        Task<ObservableList<String>> task = new Task<ObservableList<String>>() {
+//            @Override
+//            public ObservableList<String> call() {
+//                return pm.getDevicePackages();
+//            }
+//        };
+//
+//        task.setOnSucceeded(e -> {
+//            ObservableList<String> result = task.getValue();
+//            // update UI with result
+//            if (result.get(0).contains("not found")) {
+//                showPopup("Device has been disconnected");
+//                this.packageListComboBox.getItems().clear();
+//                refreshDevicesPress();
+//            } else {
+//                Platform.runLater(() -> {
+//                    // this.packageListComboBox.getItems().removeAll(this.packageListComboBox.getItems());
+//                    this.packageListComboBox.getItems().setAll(result);
+//                });
+//            }
+//        });
+//
+//        new Thread(task).start();
+//        this.packageListComboBox.getItems().removeAll(this.packageListComboBox.getItems());
+//    }

@@ -1,6 +1,5 @@
 package abct;
 
-import abct.Utils.GlobalTools;
 import abct.adb_tools.InstallApk;
 import abct.adb_tools.LogCapture;
 import abct.adb_tools.PackageManager;
@@ -8,20 +7,24 @@ import abct.scrcpy.Scrcpy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.*;
-import javafx.util.Callback;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.text.BreakIterator;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static abct.adb_tools.LogCapture.*;
 import static abct.adb_tools.getDevices.getDevicesList;
@@ -72,7 +75,6 @@ public class MainViewController extends AbstractController implements Initializa
     @FXML
     private ComboBox<String> logCaptureLevelFilter;
 
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //checkAdb();
@@ -96,33 +98,30 @@ public class MainViewController extends AbstractController implements Initializa
     }
 
 
-    @FXML
+
+    @FXML // Works as expected but locks app as it's executing - using threads ect. leads to problems with resizing - BUT LOOKS FINE THO!
     private void updatePackageList() {
-        Platform.runLater(
-                () -> {
-                    PackageManager pm = new PackageManager(this);
-                    if (isDeviceSelected()) {
-                        ObservableList<String> packages = pm.getDevicePackages();
-                        if (packages.get(0).contains("not found")) {
-                            showPopup("Device has been disconnected");
-                            this.packageListComboBox.getItems().clear();
-                            try {
-                                refreshDevicesPress();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            this.packageListComboBox.setVisibleRowCount(8);
-                            this.packageListComboBox.setItems(packages);
-                            System.out.println(this.packageListComboBox.getVisibleRowCount());
-                        }
-                    } else {
-                        this.packageListComboBox.hide();
-                    }
-                }
-        );
-        //TODO: ON SHIFT+CLICK OPEN POPUP WITH SELECTION OF PACKAGE TYPE
+        if (!isDeviceSelected()) {
+            Platform.runLater(() -> this.packageListComboBox.hide());
+            return;
+        }
+
+        PackageManager pm = new PackageManager(this);
+        ObservableList<String> packages = pm.getDevicePackages();
+
+        if (packages.get(0).contains("not found")) {
+            showPopup("Device has been disconnected");
+            this.packageListComboBox.getItems().clear();
+            refreshDevicesPress();
+        } else {
+            this.packageListComboBox.getItems().setAll(packages);
+            this.packageListComboBox.setVisibleRowCount(Math.min(this.packageListComboBox.getItems().size(), 8));
+        }
+
     }
+
+//
+
 
     //TODO: Where possible: If failed to uninstall -> Add logs
     @FXML
@@ -169,7 +168,6 @@ public class MainViewController extends AbstractController implements Initializa
     /*
 
      TODO:
-     - Click on list -> Refresh (or if slow or smth, add button)
      - Click on button -> If succesfull -> Set text as "Done!" wait for few sec (3) -> set back to default text (get it before - pass as arg.) - and maybe implement in install status field
      */
 
@@ -179,13 +177,16 @@ public class MainViewController extends AbstractController implements Initializa
     }
 
     @FXML
-    private void apkInstall() throws InterruptedException {
+    private void apkInstall(){
+        String apkPath = apkPickerTextBox.getText();
         if (null == getDevice()) {
             showPopup("No device selected!");
-        } else if (null == apkPickerTextBox.getText() || apkPickerTextBox.getText().equals("")) {
-            //TODO: Check if file is .apk or .apex
+        } else if (null == apkPath || apkPath.equals("")) {
             showPopup("Missing apk file location!");
-        } else {
+        } else if (!apkPath.endsWith(".apk") && !apkPath.endsWith(".apex")){
+            showPopup("Unsupported file type selected!");
+        }
+        else {
             InstallApk installApk = new InstallApk(this);
             Thread t1 = new Thread(installApk);
             t1.start();
@@ -270,8 +271,12 @@ public class MainViewController extends AbstractController implements Initializa
     }
 
     @FXML
-    private void refreshDevicesPress() throws IOException {
-        devices = getDevicesList();
+    private void refreshDevicesPress() {
+        try {
+            devices = getDevicesList();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println(devices);
         UpdateDevicesList();
     }
@@ -360,7 +365,7 @@ public class MainViewController extends AbstractController implements Initializa
         }
     }
 
-    public void checkAdb()  {
+    public void checkAdb() {
         if (!checkAdbStatus()) {
             showPopup("NO ADB DETECTED");
             Platform.exit();

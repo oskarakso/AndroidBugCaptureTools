@@ -1,20 +1,15 @@
 package abct;
 
-import abct.adb_tools.InstallationLogs;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
-
-import static abct.Utils.GlobalTools.combineInputStreams;
 
 public class AbstractController {
     //Prevents user from clicking other stages
     public static Main main;
+    private static String recentPackageDevice = null;
 
     public void setMainApp(Main main) {
         this.main = main;
@@ -31,7 +26,7 @@ public class AbstractController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         switch (fileType) {
-            case "apk" -> fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("APK", "*.apk"));
+            case "apk" -> fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("APK / APEX", "*.apk", "*.apex"));
             case "exe" -> fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("EXE", "*.exe"));
         }
         File selectedFile = fileChooser.showOpenDialog(main.getPrimaryStage());
@@ -52,4 +47,14 @@ public class AbstractController {
         //but if adb exists - no matter what it returns - it will go here and boom works
         return true;
     }
+
+    String recentPackageDevice(){
+        return recentPackageDevice;
+    }
+
+    void recentPackageDevice(String device){
+        recentPackageDevice = device;
+    }
+
+
 }
