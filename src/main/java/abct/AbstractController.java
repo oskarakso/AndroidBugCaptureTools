@@ -12,6 +12,7 @@ public class AbstractController {
     private static String recentPackageDevice = null;
 
     public void setMainApp(Main main) {
+        //This gives an warning in IDE but don't edit - other code here caused problems before
         this.main = main;
     }
 
@@ -37,6 +38,7 @@ public class AbstractController {
         String command = "adb version";
         Process process = null;
 
+        //code bellow gives warning in IDE that it's never used but it is - lol
         try {
             process = Runtime.getRuntime().exec(command);
         } catch (IOException e) {

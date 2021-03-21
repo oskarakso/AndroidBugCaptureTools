@@ -1,14 +1,35 @@
 package abct.Utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import abct.MainViewController;
+import javafx.beans.DefaultProperty;
+
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class GlobalTools {
+
+    public static Process executeCmdAdb(String command) {
+        Process process = null;
+
+        try {
+            process = Runtime.getRuntime().exec(command);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            assert process != null;
+            //process.waitFor(5, TimeUnit.SECONDS); //just in case
+            process.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return process;
+    }
 
     public static String getTimeDate() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH:mm:ss");
@@ -25,15 +46,16 @@ public class GlobalTools {
         return sb.toString();
     }
 
+    //some adb
     public static ArrayList<String> combineInputStreams(InputStream in1, InputStream in2) throws IOException {
-        ArrayList <String> toReturn = new ArrayList<>();
+        ArrayList<String> toReturn = new ArrayList<>();
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(in1));
         String line = null;
         while ((line = reader.readLine()) != null) {
             //System.out.println(line);
             toReturn.add(line);
-            }
+        }
         reader = new BufferedReader(new InputStreamReader(in2));
         while ((line = reader.readLine()) != null) {
             //System.out.println(line);
@@ -41,4 +63,6 @@ public class GlobalTools {
         }
         return toReturn;
     }
+
+
 }

@@ -7,27 +7,21 @@ import abct.scrcpy.Scrcpy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.*;
 
 import java.io.IOException;
 import java.net.URL;
-import java.text.BreakIterator;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+
 
 import static abct.adb_tools.LogCapture.*;
-import static abct.adb_tools.getDevices.getDevicesList;
+import static abct.adb_tools.getDevices.*;
 
 
 public class MainViewController extends AbstractController implements Initializable {
@@ -37,7 +31,7 @@ public class MainViewController extends AbstractController implements Initializa
     private String logCaptureOutputFormatDefaultSelection;
     private String logCaptureLevelFilterDefaultSelection;
     public boolean isStarted = false;
-    public static ArrayList<String> installationLogs = new ArrayList<String>();
+    public static ArrayList<String> installationLogs = new ArrayList<>();
 
     @FXML
     private Text focus_loser;
@@ -77,7 +71,6 @@ public class MainViewController extends AbstractController implements Initializa
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //checkAdb();
         //Read and set scrcpy location
         this.scrcpyLocation = Scrcpy.getLocation();
         //Read and set log formats/filters
@@ -89,108 +82,148 @@ public class MainViewController extends AbstractController implements Initializa
         logCaptureLevelFilterDefaultSelection = logCaptureLevelFilter.getValue();
     }
 
+    // -- LOG CAPTURE -- \\
+
     @FXML
     public void dumpLogs() {
+        //todo: - whole backend
+        // isSelectedDeviceAvailable(){ --- }
         new Thread(() -> {
             LogCapture lc = new LogCapture(this);
             lc.dumpLogs();
         }).start();
     }
 
+    @FXML
+    private void cleanLogs() {
+        if (isSelectedDeviceConnected()) {
+            new Thread(() -> {
+                LogCapture lc = new LogCapture(this);
+                lc.cleanLogs();
+            }).start();
+        }
+    }
 
 
-    @FXML // Works as expected but locks app as it's executing - using threads ect. leads to problems with resizing - BUT LOOKS FINE THO!
-    private void updatePackageList() {
+    // -- PACKAGE MANAGER -- \\
+
+    //todo: think about better inheritance or smth to make MVC smaller as it's getting too big rn
+    @FXML
+    // Works as expected but locks app as it's executing - using threads ect. leads to problems with resizing - BUT LOOKS FINE THO!
+    private void updatePackageList() throws IOException {
         if (!isDeviceSelected()) {
             Platform.runLater(() -> this.packageListComboBox.hide());
+            loseFocus();
+            return;
+        }
+
+        if (!isSelectedDeviceConnected()) {
+            this.packageListComboBox.getItems().clear();
+            Platform.runLater(() -> this.packageListComboBox.hide());
+            loseFocus();
             return;
         }
 
         PackageManager pm = new PackageManager(this);
         ObservableList<String> packages = pm.getDevicePackages();
 
-        if (packages.get(0).contains("not found")) {
-            showPopup("Device has been disconnected");
-            this.packageListComboBox.getItems().clear();
-            refreshDevicesPress();
-        } else {
-            this.packageListComboBox.getItems().setAll(packages);
-            this.packageListComboBox.setVisibleRowCount(Math.min(this.packageListComboBox.getItems().size(), 8));
-        }
-
-    }
-
-//
-
-
-    //TODO: Where possible: If failed to uninstall -> Add logs
-    @FXML
-    private void cleanLogs() {
-        new Thread(() -> {
-            LogCapture lc = new LogCapture(this);
-            lc.cleanLogs();
-        }).start();
-
+        this.packageListComboBox.getItems().setAll(packages);
+        this.packageListComboBox.setVisibleRowCount(Math.min(this.packageListComboBox.getItems().size(), 8));
     }
 
     @FXML
     private void closeApk() {
-        new Thread(() -> {
-            PackageManager pm = new PackageManager(this);
-            pm.closeApk();
-        }).start();
+        if (isSelectedDeviceConnected()) {
+            new Thread(() -> {
+                PackageManager pm = new PackageManager(this);
+                pm.closeApk();
+            }).start();
+        }
     }
 
     @FXML
     private void uninstallApk() {
-        new Thread(() -> {
-            PackageManager pm = new PackageManager(this);
-            pm.uninstallApp();
-        }).start();
+        if (isSelectedDeviceConnected()) {
+            new Thread(() -> {
+                PackageManager pm = new PackageManager(this);
+                try {
+                    pm.uninstallApp();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Platform.runLater(() -> showPopup(e.getMessage()));
+                }
+            }).start();
+        }
     }
 
     @FXML
     private void openApk() {
-        new Thread(() -> {
-            PackageManager pm = new PackageManager(this);
-            pm.openApk();
-        }).start();
+        if (isSelectedDeviceConnected()) {
+            new Thread(() -> {
+                PackageManager pm = new PackageManager(this);
+                try {
+                    pm.openApk();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Platform.runLater(() -> showPopup(e.getMessage()));
+                }
+            }).start();
+        }
     }
 
     @FXML
     private void clearApkData() {
-        new Thread(() -> {
-            PackageManager pm = new PackageManager(this);
-            pm.clearAppData();
-        }).start();
+        if (isSelectedDeviceConnected()) {
+            new Thread(() -> {
+                PackageManager pm = new PackageManager(this);
+                try {
+                    pm.clearAppData();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Platform.runLater(() -> showPopup(e.getMessage()));
+                }
+            }).start();
+        }
     }
 
-    /*
-
-     TODO:
-     - Click on button -> If succesfull -> Set text as "Done!" wait for few sec (3) -> set back to default text (get it before - pass as arg.) - and maybe implement in install status field
-     */
-
+    // -- INSTALL / UPDATE APK SECTION -- \\
     @FXML
     private void showInstallLog() {
         showLogsPopup();
     }
 
     @FXML
-    private void apkInstall(){
+    private void apkInstall() {
         String apkPath = apkPickerTextBox.getText();
+
         if (null == getDevice()) {
             showPopup("No device selected!");
-        } else if (null == apkPath || apkPath.equals("")) {
-            showPopup("Missing apk file location!");
-        } else if (!apkPath.endsWith(".apk") && !apkPath.endsWith(".apex")){
-            showPopup("Unsupported file type selected!");
+        } else {
+            if (isSelectedDeviceConnected()) {
+                if (null == apkPath || apkPath.equals("")) {
+                    showPopup("Missing apk file location!");
+                } else if (!apkPath.endsWith(".apk") && !apkPath.endsWith(".apex")) {
+                    showPopup("Unsupported file type selected!");
+                } else {
+                    InstallApk installApk = new InstallApk(this);
+                    Thread t1 = new Thread(installApk);
+                    t1.start();
+                }
+            }
         }
-        else {
-            InstallApk installApk = new InstallApk(this);
-            Thread t1 = new Thread(installApk);
-            t1.start();
+    }
+
+    // -- DEVICE SECTION -- \\
+
+    @FXML
+    private void refreshDevicesPress() {
+        try {
+            devices = getDevicesList();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        System.out.println(devices);
+        UpdateDevicesList();
     }
 
     @FXML
@@ -211,6 +244,21 @@ public class MainViewController extends AbstractController implements Initializa
         Scrcpy.saveLocation(this.scrcpyLocation);
     }
 
+    // -- UTILITIES -- \\
+
+    public Boolean isSelectedDeviceConnected() {
+        try {
+            if (!isDeviceConnected(getDevice())) {
+                showPopup("Selected device has been disconnected");
+                refreshDevicesPress();
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     @FXML
     private void loseFocus() {
         focus_loser.requestFocus();
@@ -226,7 +274,6 @@ public class MainViewController extends AbstractController implements Initializa
         popUpLogsController.showPopupWindow(installationLogs);
         loseFocus();
     }
-
 
     @FXML
     private void openFolderSelector() {
@@ -270,17 +317,102 @@ public class MainViewController extends AbstractController implements Initializa
         }
     }
 
-    @FXML
-    private void refreshDevicesPress() {
-        try {
-            devices = getDevicesList();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println(devices);
-        UpdateDevicesList();
+    public void alignmentDoinger(TextField field) {
+        if ("".equals(field.getText())) {
+            field.setAlignment(Pos.CENTER);
+            if (field.focusedProperty().getValue()) {
+                field.setAlignment(Pos.CENTER_LEFT);
+            }
+        } else
+            field.setAlignment(Pos.CENTER_LEFT);
     }
 
+    public String getApkPath() {
+        return apkPickerTextBox.getText();
+    }
+
+    public String getPackageName() {
+        return packageListComboBox.getValue();
+    }
+
+    public String getDevice() {
+        String toReturn;
+        if (null == combo_box1.getValue() || combo_box1.isDisabled() || combo_box1.getValue().contains("No device")) {
+            return null;
+        } else {
+            toReturn = combo_box1.getValue().split("-", 2)[0];
+            toReturn = toReturn.replaceAll("\\s+", "");
+            return toReturn;
+        }
+    }
+
+    public String getScrcpyLocation() {
+        return scrcpyLocation;
+    }
+
+    public void packageSectionDisable(Boolean state) {
+        uninstallApk.setDisable(state);
+        apkClearData.setDisable(state);
+        startApk.setDisable(state);
+        closeApk.setDisable(state);
+    }
+
+    @SuppressWarnings("RedundantIfStatement")
+    public Boolean isDeviceSelected() {
+        if (null == combo_box1.getValue()) {
+            return false;
+        }
+        if ("No devices available".equals(combo_box1.getValue())) {
+            return false;
+        }
+        if ("No device selected".equals(combo_box1.getValue())) {
+            return false;
+        } else
+            return true;
+    }
+
+    @SuppressWarnings("RedundantIfStatement")
+    public Boolean isPackageSelected() {
+        String packageEditorValue = packageListComboBox.getEditor().textProperty().getValue();
+        if (null != packageEditorValue && !"".equals(packageEditorValue)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void checkAdb() {
+        if (!checkAdbStatus()) {
+            showPopup("NO ADB DETECTED");
+            Platform.exit();
+        }
+    }
+
+    public ComboBox<String> getLogCaptureOutputFormat() {
+        return logCaptureOutputFormat;
+    }
+
+    public ComboBox<String> getLogCaptureLevelFilter() {
+        return logCaptureLevelFilter;
+    }
+
+    public String getLogCaptureOutputFormatDefaultSelection() {
+        return logCaptureOutputFormatDefaultSelection;
+    }
+
+    public String getLogCaptureLevelFilterDefaultSelection() {
+        return logCaptureLevelFilterDefaultSelection;
+    }
+
+    public String getDeviceIdName() {
+        return combo_box1.getValue();
+    }
+
+    public void addLog(String log) {
+        installationLogs.add(log);
+    }
+
+    // -- ADDITIONAL BACKEND CODE -- \\
 
     public void UpdateDevicesList() {
         ObservableList<String> deviceList = FXCollections.observableArrayList();
@@ -305,95 +437,5 @@ public class MainViewController extends AbstractController implements Initializa
             combo_box1.getSelectionModel().selectFirst();
             combo_box1.setDisable(true);
         }
-    }
-
-    public void alignmentDoinger(TextField field) {
-        if ("".equals(field.getText())) {
-            field.setAlignment(Pos.CENTER);
-            if (field.focusedProperty().getValue()) {
-                field.setAlignment(Pos.CENTER_LEFT);
-            }
-        } else
-            field.setAlignment(Pos.CENTER_LEFT);
-    }
-
-    public String getApkPath() {
-        return apkPickerTextBox.getText();
-    }
-
-    public String getPackageName() {
-        return packageListComboBox.getValue();
-    }
-
-    public String getDevice() {
-        if (null == combo_box1.getValue() || combo_box1.isDisabled() || combo_box1.getValue().contains("No device")) {
-            return null;
-        } else
-            return combo_box1.getValue().split("-", 2)[0];
-    }
-
-    public String getScrcpyLocation() {
-        return scrcpyLocation;
-    }
-
-    public void packageSectionDisable(Boolean state) {
-        uninstallApk.setDisable(state);
-        apkClearData.setDisable(state);
-        startApk.setDisable(state);
-        closeApk.setDisable(state);
-    }
-
-    public Boolean isDeviceSelected() {
-        if (null == combo_box1.getValue()) {
-            return false;
-        }
-        if ("No devices available".equals(combo_box1.getValue())) {
-            return false;
-        }
-        if ("No device selected".equals(combo_box1.getValue())) {
-            return false;
-        } else
-            return true;
-    }
-
-    public Boolean isPackageSelected() {
-        String val = packageListComboBox.getEditor().textProperty().getValue();
-        if (null != val && !"".equals(val)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public void checkAdb() {
-        if (!checkAdbStatus()) {
-            showPopup("NO ADB DETECTED");
-            Platform.exit();
-        }
-    }
-
-
-    public ComboBox<String> getLogCaptureOutputFormat() {
-        return logCaptureOutputFormat;
-    }
-
-    public ComboBox<String> getLogCaptureLevelFilter() {
-        return logCaptureLevelFilter;
-    }
-
-    public String getLogCaptureOutputFormatDefaultSelection() {
-        return logCaptureOutputFormatDefaultSelection;
-    }
-
-    public String getLogCaptureLevelFilterDefaultSelection() {
-        return logCaptureLevelFilterDefaultSelection;
-    }
-
-    public String getDeviceIdName() {
-        return combo_box1.getValue();
-    }
-
-    public void addLog(String log) {
-        installationLogs.add(log);
     }
 }

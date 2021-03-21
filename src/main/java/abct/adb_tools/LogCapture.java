@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Scanner;
 
+import static abct.Utils.GlobalTools.executeCmdAdb;
 import static abct.Utils.GlobalTools.getTimeDate;
 
 public class LogCapture extends MainViewController {
@@ -31,30 +32,23 @@ public class LogCapture extends MainViewController {
         String fileName = getName();
         System.out.println("Output format: " + outputFormatSelected());
         System.out.println("Output filter: " + outputFilterSelected());
+        //todo: whole func
+
         //adb -s DEVID -v (logCaptureOutputFormat - value logic) -d
         //adb -s DEVID logcat -v (log output format) *:(log output filter)
         //adb logcat "Control log output format" "dump" "log buffers" > filename.txt
+
+
     }
 
     public void cleanLogs() {
         String deviceID = mvc.getDevice();
         // adb -s DEVID logcat -c
         String command = "adb -s " + deviceID + " logcat -c";
-        Process process = null;
-        try {
-            process = Runtime.getRuntime().exec(command);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            process.waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        executeCmdAdb(command);
     }
 
     public static ObservableList<String> getListFromTxt(String path) {
-// ObservableList<String> outputFormats = FXCollections.observableArrayList();
         File txtFile = new File(path);
         ObservableList<String> toReturn = FXCollections.observableArrayList();
         Scanner sc = null;
@@ -82,7 +76,7 @@ public class LogCapture extends MainViewController {
         if (val.equals(mvc.getLogCaptureOutputFormatDefaultSelection()))
             return "";
         else
-            return val;
+            return colonCutter(val);
     }
 
     private String outputFilterSelected() {
@@ -90,6 +84,11 @@ public class LogCapture extends MainViewController {
         if (val.equals(mvc.getLogCaptureLevelFilterDefaultSelection()))
             return "";
         else
-            return val;
+            return colonCutter(val);
     }
+
+    private String colonCutter(String str){
+        return str.split(":", 2)[0];
+    }
+
 }

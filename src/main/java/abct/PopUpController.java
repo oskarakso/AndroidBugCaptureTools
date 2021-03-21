@@ -7,7 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.text.Text;
+import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -21,7 +21,7 @@ public class PopUpController extends AbstractController implements Initializable
     private static String text;
 
     @FXML
-    private Text textContent;
+    private Label textContent;
     @FXML
     private Button returnButton;
 
@@ -29,7 +29,6 @@ public class PopUpController extends AbstractController implements Initializable
     void returnAction(ActionEvent event) {
         closeStage();
     }
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         textContent.setText(text);
@@ -38,6 +37,7 @@ public class PopUpController extends AbstractController implements Initializable
         });
     }
 
+    //todo: Add dynamic text resize if out of label area (Utils.computeClippedText)
     public void showPopupWindow(String textToShow) {
         text = textToShow;
         FXMLLoader loader = new FXMLLoader();

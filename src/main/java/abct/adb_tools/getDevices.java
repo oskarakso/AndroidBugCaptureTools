@@ -45,5 +45,43 @@ public class getDevices {
         }
         return name;
     }
+
+    public static boolean isAnyDeviceConnected() throws IOException {
+        String line;
+        StringBuilder output = new StringBuilder();
+        InputStream inStream;
+        String command = "adb devices";
+        Process process = Runtime.getRuntime().exec(command);
+        inStream = process.getInputStream();
+
+        BufferedReader brCleanUp = new BufferedReader(
+                new InputStreamReader(inStream));
+        while ((line = brCleanUp.readLine()) != null) {
+            if (!line.equals("")) {
+                output.append(line);
+            }
+        }
+
+        return !output.toString().equals("List of devices attached");
+    }
+
+    public static Boolean isDeviceConnected(String id) throws IOException {
+        String line;
+        StringBuilder output = new StringBuilder();
+        InputStream inStream;
+        String command = "adb devices";
+        Process process = Runtime.getRuntime().exec(command);
+        inStream = process.getInputStream();
+
+        BufferedReader brCleanUp = new BufferedReader(
+                new InputStreamReader(inStream));
+        while ((line = brCleanUp.readLine()) != null) {
+            if (!line.equals("")) {
+                output.append(line);
+            }
+        }
+        return output.toString().contains(id);
+    }
+
 }
 

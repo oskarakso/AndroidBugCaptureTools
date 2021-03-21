@@ -11,11 +11,6 @@ import static abct.Utils.GlobalTools.combineInputStreams;
 
 public class InstallApk implements Runnable {
     MainViewController mainViewController;
-    String line = "xx";
-
-    public String getLine() {
-        return this.line;
-    }
 
     public InstallApk(MainViewController mainViewController) {
         this.mainViewController = mainViewController;
@@ -23,34 +18,32 @@ public class InstallApk implements Runnable {
 
     private void install() throws InterruptedException, IOException {
         String path = mainViewController.getApkPath();
-        //System.out.println("path - " + path);
         String deviceID = mainViewController.getDevice();
-        //System.out.println("DevID - " + deviceID);
         if (path == null || deviceID == null) {
             setAs("fail");
             return;
         }
-
         //adb -s deviceID install "path"
-        String command = "adb -s " + deviceID + "install \"" + path + "\"";
-        //System.out.println(command);
+        String command = "adb -s " + deviceID + " install -r \"" + path + "\"";
 
+        //TODO: I think it needs some deep investigation if it couldn't be optimized or refactored tbh...
         setAs("start");
         Process process = Runtime.getRuntime().exec(command);
         process.waitFor(3, TimeUnit.MINUTES);
 
-        InputStream inStream = process.getInputStream();
-        InputStream erStream = process.getErrorStream();
-
-        ArrayList<String> processOutput = combineInputStreams(inStream, erStream);
+        ArrayList<String> processOutput = combineInputStreams(process.getInputStream(), process.getErrorStream());
         processOutput.forEach((n) -> {
             if (n.toLowerCase().contains("success")) {
                 setAs("pass");
-            } else if (n.toLowerCase().contains("waiting for device") || n.toLowerCase().contains(" failed ") || n.toLowerCase().contains("failure") || n.toLowerCase().contains("doesn't end") || n.toLowerCase().contains("error: ")) {
+            } else if (isFailedOnStart(n)) {
                 setAs("fail");
                 mainViewController.addLog(InstallationLogs.createFailedInstallLog(n, mainViewController.getDeviceIdName()));
             }
         });
+    }
+
+    private Boolean isFailedOnStart(String n) {
+        return (n.toLowerCase().contains("waiting for device") || n.toLowerCase().contains(" failed ") || n.toLowerCase().contains("failure") || n.toLowerCase().contains("doesn't end") || n.toLowerCase().contains("error: "));
     }
 
     @Override
