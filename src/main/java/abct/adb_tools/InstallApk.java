@@ -24,7 +24,7 @@ public class InstallApk implements Runnable {
             return;
         }
         //adb -s deviceID install "path"
-        String command = "adb -s " + deviceID + " install -r \"" + path + "\"";
+        String command = "adb -s " + deviceID + " install \"" + path + "\"";
 
         //TODO: I think it needs some deep investigation if it couldn't be optimized or refactored tbh...
         setAs("start");

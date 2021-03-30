@@ -125,9 +125,7 @@ public class MainViewController extends AbstractController implements Initializa
         }
 
         PackageManager pm = new PackageManager(this);
-        ObservableList<String> packages = pm.getDevicePackages();
-
-        this.packageListComboBox.getItems().setAll(packages);
+        this.packageListComboBox.getItems().setAll(pm.getDevicePackages());
         this.packageListComboBox.setVisibleRowCount(Math.min(this.packageListComboBox.getItems().size(), 8));
     }
 

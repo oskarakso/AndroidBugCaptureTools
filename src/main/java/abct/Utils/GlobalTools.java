@@ -20,14 +20,6 @@ public class GlobalTools {
             e.printStackTrace();
         }
 
-        try {
-            assert process != null;
-            //process.waitFor(5, TimeUnit.SECONDS); //just in case
-            process.waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         return process;
     }
 

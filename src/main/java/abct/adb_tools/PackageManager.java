@@ -23,23 +23,18 @@ public class PackageManager extends MainViewController implements Runnable {
     public void openApk() throws Exception {
         String deviceID = mainViewController.getDevice();
         String packageName = mainViewController.getPackageName();
-        String line = "";
         //adb -s deviceID shell monkey -p com.package.name -c android.intent.category.LAUNCHER 1
         String command = "adb -s " + deviceID + " shell monkey -p " + packageName + "  -c android.intent.category.LAUNCHER 1";
+        Process process = executeCmdAdb(command);
+        List<String> processOutput = combineInputStreams(process.getInputStream(), process.getErrorStream());
 
-        BufferedReader brCleanUp = new BufferedReader(new InputStreamReader(executeCmdAdb(command).getInputStream()));
-        while (brCleanUp.readLine() != null) {
-            try {
-                if ((line = brCleanUp.readLine()) == null) break;
-            } catch (IOException ignored) {
-            }
-            if (!line.equals("")) {
-                if (line.contains("monkey aborted")) {
-                    throw new Exception("Failed to open: \n " + packageName);
-                }
+        for (String s : processOutput) {
+            if (s.contains("monkey aborted")) {
+                throw new Exception("Failed to open: \n " + packageName);
             }
         }
     }
+
 
     //not returning anything on failed (for ex. if package doesn't exist)
     public void closeApk() {
@@ -54,7 +49,7 @@ public class PackageManager extends MainViewController implements Runnable {
     public void uninstallApp() throws Exception {
         String deviceID = mainViewController.getDevice();
         String packageName = mainViewController.getPackageName();
-        String command = "adb -s " + deviceID + " uninstall " + packageName;
+        String command = "adb -s " + deviceID + " shell pm uninstall " + packageName;
         String line = "";
 
         BufferedReader brCleanUp = new BufferedReader(new InputStreamReader(executeCmdAdb(command).getInputStream()));
@@ -80,17 +75,16 @@ public class PackageManager extends MainViewController implements Runnable {
         }
     }
 
-
+    //TODO: debug why it does lock app
     public ObservableList<String> getDevicePackages() throws IOException {
         //adb shell pm list packages -3
         String deviceID = mainViewController.getDevice();
         String option = "3"; //show only 3rd party packages, showing system ones might lead to some "accidents :)"
         String command = "adb -s " + deviceID + " shell pm list packages -" + option;
-
         Process process = executeCmdAdb(command);
         List<String> processOutput = combineInputStreams(process.getInputStream(), process.getErrorStream());
-
         ObservableList<String> toReturn = FXCollections.observableArrayList();
+
         //Trimming lines and deleting empty ones (occurred on 6.0.1)
         processOutput.forEach((n) -> {
             String s1 = n.substring(n.indexOf(":") + 1);
