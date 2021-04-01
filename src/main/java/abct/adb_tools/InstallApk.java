@@ -19,12 +19,14 @@ public class InstallApk implements Runnable {
     private void install() throws InterruptedException, IOException {
         String path = mainViewController.getApkPath();
         String deviceID = mainViewController.getDevice();
+        Boolean isInstallMode = mainViewController.isInstallMode;
         if (path == null || deviceID == null) {
             setAs("fail");
             return;
         }
         //adb -s deviceID install "path"
-        String command = "adb -s " + deviceID + " install \"" + path + "\"";
+        String command = "adb -s " + deviceID + getInstallMode() + path + "\"";
+        //String command = "adb -s " + deviceID + " install \"" + path + "\"";
 
         //TODO: I think it needs some deep investigation if it couldn't be optimized or refactored tbh...
         setAs("start");
@@ -37,6 +39,7 @@ public class InstallApk implements Runnable {
                 setAs("pass");
             } else if (isFailedOnStart(n)) {
                 setAs("fail");
+                //TODO: Consider adding line + next line as it sometimes contains additional info
                 mainViewController.addLog(InstallationLogs.createFailedInstallLog(n, mainViewController.getDeviceIdName()));
             }
         });
@@ -58,6 +61,14 @@ public class InstallApk implements Runnable {
             return;
         }
         System.out.println("Dropped new thread");
+    }
+
+    private String getInstallMode(){
+        if(mainViewController.isInstallMode){
+            return " install \"";
+        } else {
+            return " install -r \"";
+        }
     }
 
     public void setAs(String s) {

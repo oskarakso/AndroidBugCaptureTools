@@ -75,7 +75,6 @@ public class PackageManager extends MainViewController implements Runnable {
         }
     }
 
-    //TODO: debug why it does lock app
     public ObservableList<String> getDevicePackages() throws IOException {
         //adb shell pm list packages -3
         String deviceID = mainViewController.getDevice();

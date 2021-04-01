@@ -32,9 +32,13 @@ public class MainViewController extends AbstractController implements Initializa
     private String logCaptureLevelFilterDefaultSelection;
     public boolean isStarted = false;
     public static ArrayList<String> installationLogs = new ArrayList<>();
+    //True - Install apk + install button, False - Update apk + update button
+    public boolean isInstallMode = true;
 
     @FXML
     private Text focus_loser;
+    @FXML
+    private Text installUpdateApkTextField;
     @FXML
     public TextField destinationFolderPath;
     @FXML
@@ -191,6 +195,11 @@ public class MainViewController extends AbstractController implements Initializa
     }
 
     @FXML
+    private void changeInstallMode() {
+        changeInstallMode(isInstallMode);
+    }
+
+    @FXML
     private void apkInstall() {
         String apkPath = apkPickerTextBox.getText();
 
@@ -226,13 +235,13 @@ public class MainViewController extends AbstractController implements Initializa
 
     @FXML
     private void scrcpyLaunch() {
-        if (null == getDevice()) {
-            showPopup("No device selected!");
-        } else if (null == getScrcpyLocation()) {
-            showPopup("Missing scrcpy exe \n file location!");
-        } else {
-            Scrcpy scrcpy = new Scrcpy(this);
-            scrcpy.runScrcpy();
+        if (isSelectedDeviceConnected()) {
+            if (null == getScrcpyLocation()) {
+                showPopup("Missing scrcpy exe \n file location!");
+            } else {
+                Scrcpy scrcpy = new Scrcpy(this);
+                scrcpy.runScrcpy();
+            }
         }
     }
 
@@ -410,7 +419,19 @@ public class MainViewController extends AbstractController implements Initializa
         installationLogs.add(log);
     }
 
-    // -- ADDITIONAL BACKEND CODE -- \\
+    // -- ADDITIONAL BACK/FRONTEND CODE -- \\
+
+    public void changeInstallMode(Boolean b) {
+        if (b) {
+            installUpdateApkTextField.setText("Update apk");
+            apkInstall.setText("Update");
+            isInstallMode = false;
+        } else {
+            installUpdateApkTextField.setText("Install apk");
+            apkInstall.setText("Install");
+            isInstallMode = true;
+        }
+    }
 
     public void UpdateDevicesList() {
         ObservableList<String> deviceList = FXCollections.observableArrayList();
