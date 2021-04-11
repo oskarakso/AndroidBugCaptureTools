@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static abct.Utils.GlobalTools.combineInputStreams;
 
@@ -19,17 +20,16 @@ public class InstallApk implements Runnable {
     private void install() throws InterruptedException, IOException {
         String path = mainViewController.getApkPath();
         String deviceID = mainViewController.getDevice();
-        Boolean isInstallMode = mainViewController.isInstallMode;
+        AtomicBoolean additionalLogs = new AtomicBoolean(false);
         if (path == null || deviceID == null) {
             setAs("fail");
             return;
         }
         //adb -s deviceID install "path"
         String command = "adb -s " + deviceID + getInstallMode() + path + "\"";
-        //String command = "adb -s " + deviceID + " install \"" + path + "\"";
 
-        //TODO: I think it needs some deep investigation if it couldn't be optimized or refactored tbh...
         setAs("start");
+
         Process process = Runtime.getRuntime().exec(command);
         process.waitFor(3, TimeUnit.MINUTES);
 
@@ -39,10 +39,15 @@ public class InstallApk implements Runnable {
                 setAs("pass");
             } else if (isFailedOnStart(n)) {
                 setAs("fail");
-                //TODO: Consider adding line + next line as it sometimes contains additional info
                 mainViewController.addLog(InstallationLogs.createFailedInstallLog(n, mainViewController.getDeviceIdName()));
+                additionalLogs.set(true);
+            } else if (additionalLogs.get() && !(n.contains("com.android.server.pm"))) {
+                //com.android.server.pm - is just debug info that isn't necessary in this case
+                mainViewController.addLog(n);
             }
         });
+        //As there won't be any more logs from this installation - logs are separated by new line
+        mainViewController.addLog("\n");
     }
 
     private Boolean isFailedOnStart(String n) {
@@ -63,8 +68,8 @@ public class InstallApk implements Runnable {
         System.out.println("Dropped new thread");
     }
 
-    private String getInstallMode(){
-        if(mainViewController.isInstallMode){
+    private String getInstallMode() {
+        if (mainViewController.isInstallMode) {
             return " install \"";
         } else {
             return " install -r \"";

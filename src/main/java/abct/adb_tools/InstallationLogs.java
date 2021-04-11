@@ -11,7 +11,6 @@ public class InstallationLogs {
                 " | " +
                 device +
                 " | " +
-                line +
-                "\n";
+                line;
     }
 }
