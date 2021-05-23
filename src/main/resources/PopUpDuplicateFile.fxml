@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="208.0" prefWidth="418.0" stylesheets="@css/popUp.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="abct.PopUpDuplicateFileController">
+   <children>
+      <ImageView fitHeight="131.0" fitWidth="148.0" layoutX="19.0" layoutY="39.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@images/warning.png" />
+         </image>
+      </ImageView>
+      <TextField fx:id="fileNameField" alignment="CENTER" layoutX="189.0" layoutY="110.0" prefHeight="27.0" prefWidth="187.0" promptText="&lt;file name&gt;" stylesheets="@css/folderPickerTextBox.css" />
+      <Label fx:id="textContent" alignment="CENTER" layoutX="154.0" prefHeight="110.0" prefWidth="257.0" text="lorem ipsum dolor sit amet consectetur adipiscing elit" textAlignment="CENTER" textFill="WHITE" wrapText="true">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Button fx:id="cancelButton" layoutX="189.0" layoutY="159.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="84.0" style="-fx-background-color: #545454; -fx-border-color: transparent; -fx-color: #545454; -fx-focus-color: transparent;" stylesheets="@css/return_button.css" text="CANCEL" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Button>
+      <Button fx:id="saveButton" layoutX="292.0" layoutY="159.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="84.0" style="-fx-background-color: #545454; -fx-border-color: transparent; -fx-color: #545454; -fx-focus-color: transparent;" stylesheets="@css/return_button.css" text="SAVE" textAlignment="CENTER">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

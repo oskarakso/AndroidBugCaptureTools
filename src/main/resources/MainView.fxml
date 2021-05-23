@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane onMouseClicked="#loseFocus" prefHeight="651.0" prefWidth="1024.0" style="-fx-background-color: #121212;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="abct.MainViewController">
+<AnchorPane onMouseClicked="#loseFocus" prefHeight="651.0" prefWidth="1024.0" stylesheets="@css/mainView.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="abct.MainViewController">
    <children>
       <Button fx:id="start_stop" alignment="CENTER" graphicTextGap="2.0" layoutX="415.0" layoutY="553.0" mnemonicParsing="false" onAction="#start_stop_press" prefHeight="84.0" prefWidth="194.0" style="-fx-background-color: #00b312;" stylesheets="@css/start_stop.css" text="START" textAlignment="CENTER" textFill="#fffefe" textOverrun="CLIP" wrapText="true" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="415.0" AnchorPane.rightAnchor="415.0" AnchorPane.topAnchor="553.0">
          <font>
@@ -137,7 +137,7 @@
          </font>
       </CheckBox>
       <ComboBox fx:id="logCaptureOutputFormat" layoutX="814.0" layoutY="184.0" prefHeight="36.0" prefWidth="152.0" promptText="Log output format" style="-fx-background-color: #545454; -fx-border-color: transparent; -fx-color: #545454; -fx-focus-color: transparent;" stylesheets="@css/combobox.css" />
-      <CheckBox fx:id="destinationFolderDefault" layoutX="37.0" layoutY="619.0" mnemonicParsing="false" stylesheets="@css/checkButton.css" text="Use default file names" textFill="WHITE" />
+      <CheckBox fx:id="destinationFileDefault" layoutX="37.0" layoutY="619.0" mnemonicParsing="false" stylesheets="@css/checkButton.css" text="Use default file names" textFill="WHITE" />
       <CheckBox fx:id="logsCleanOnStart" layoutX="814.0" layoutY="278.0" mnemonicParsing="false" stylesheets="@css/checkButton.css" text="Clean logcat on start" textFill="WHITE" />
       <Button fx:id="logsDump" alignment="CENTER" contentDisplay="CENTER" layoutX="813.0" layoutY="306.0" mnemonicParsing="false" onAction="#dumpLogs" prefHeight="47.0" prefWidth="67.0" stylesheets="@css/buttonNormal.css" text=" Save Logs" textAlignment="CENTER" wrapText="true" />
       <Button fx:id="logsClean" alignment="CENTER" layoutX="889.0" layoutY="306.0" mnemonicParsing="false" onAction="#cleanLogs" prefHeight="47.0" prefWidth="78.0" stylesheets="@css/buttonNormal.css" text="Clean Logs" textAlignment="CENTER" wrapText="true" />

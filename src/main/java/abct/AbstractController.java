@@ -1,7 +1,9 @@
 package abct;
 
+import javafx.beans.value.ChangeListener;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +36,7 @@ public class AbstractController {
         return selectedFile.toString();
     }
 
-    Boolean checkAdbStatus()  {
+    Boolean checkAdbStatus() {
         String command = "adb version";
         Process process = null;
 
@@ -50,11 +52,30 @@ public class AbstractController {
         return true;
     }
 
-    String recentPackageDevice(){
+    public void centerStage(Stage stage) {
+        ChangeListener<Number> widthListener = (observable, oldValue, newValue) -> {
+            double stageWidth = newValue.doubleValue();
+            stage.setX(main.getPrimaryStage().getX() + main.getPrimaryStage().getWidth() / 2 - stageWidth / 2);
+        };
+        ChangeListener<Number> heightListener = (observable, oldValue, newValue) -> {
+            double stageHeight = newValue.doubleValue();
+            stage.setY(main.getPrimaryStage().getY() + main.getPrimaryStage().getHeight() / 2 - stageHeight / 2);
+        };
+
+        stage.widthProperty().addListener(widthListener);
+        stage.heightProperty().addListener(heightListener);
+
+        stage.setOnShown(e -> {
+            stage.widthProperty().removeListener(widthListener);
+            stage.heightProperty().removeListener(heightListener);
+        });
+    }
+
+    String recentPackageDevice() {
         return recentPackageDevice;
     }
 
-    void recentPackageDevice(String device){
+    void recentPackageDevice(String device) {
         recentPackageDevice = device;
     }
 

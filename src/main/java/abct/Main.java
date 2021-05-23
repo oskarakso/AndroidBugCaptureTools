@@ -1,5 +1,6 @@
 package abct;
 
+import abct.Utils.GlobalTools;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -8,11 +9,12 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ComboBox;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+
+import static abct.MainViewController.getDestinationFolderTxtPath;
 
 
 public class Main extends Application {
@@ -45,6 +47,9 @@ public class Main extends Application {
         primaryStage.setTitle("Bug Capture Tools");
         primaryStage.initStyle(StageStyle.UNDECORATED);
 
+        primaryStage.getScene().setFill(Color.TRANSPARENT);
+        primaryStage.initStyle(StageStyle.TRANSPARENT);
+        primaryStage.setTitle("ABCT");
         primaryStage.show();
 
         mainViewController.checkAdb();
@@ -61,6 +66,8 @@ public class Main extends Application {
 
 
         ///LISTENERS SECTION
+        myControllerHandle.destinationFolderPath.textProperty().addListener(observable ->
+                GlobalTools.saveValueInTxt(getDestinationFolderTxtPath(), myControllerHandle.destinationFolderPath.getText()));
 
         // PACKAGE MANAGER
         myControllerHandle.packageListComboBox.getEditor().textProperty().addListener(new ChangeListener<String>() {
@@ -77,8 +84,10 @@ public class Main extends Application {
         });
 
         //alignment after change (by focus) on text-fields
-        myControllerHandle.destinationFolderPath.focusedProperty().addListener((obs, oldVal, newVal) ->
-                myControllerHandle.alignmentDoinger(myControllerHandle.destinationFolderPath));
+        myControllerHandle.destinationFolderPath.focusedProperty().addListener((obs, oldVal, newVal) -> {
+                    myControllerHandle.alignmentDoinger(myControllerHandle.destinationFolderPath);
+                }
+        );
 
         myControllerHandle.logCaptureFileName.focusedProperty().addListener((obs, oldVal, newVal) ->
                 myControllerHandle.alignmentDoinger(myControllerHandle.logCaptureFileName));

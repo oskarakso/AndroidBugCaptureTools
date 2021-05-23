@@ -1,5 +1,7 @@
 package abct;
 
+import abct.Utils.DuplicateFileReturn;
+import abct.Utils.MainViewControllerTools;
 import abct.adb_tools.InstallApk;
 import abct.adb_tools.LogCapture;
 import abct.adb_tools.PackageManager;
@@ -14,12 +16,16 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.*;
+import javafx.util.Pair;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
-
+import static abct.Utils.GlobalTools.*;
 import static abct.adb_tools.LogCapture.*;
 import static abct.adb_tools.getDevices.*;
 
@@ -27,7 +33,9 @@ import static abct.adb_tools.getDevices.*;
 public class MainViewController extends AbstractController implements Initializable {
 
     protected Map<String, String> devices;
-    private String scrcpyLocation = null;
+    private static final String scrcpyLocationStoredPath = "src/main/resources/text-content/ScrCpyLocation.txt";
+    private static final String destinationFolderTxtPath = "src/main/resources/text-content/destinationFolderLocation.txt";
+    private static String scrcpyLocation = getTextFromFile(scrcpyLocationStoredPath);
     private String logCaptureOutputFormatDefaultSelection;
     private String logCaptureLevelFilterDefaultSelection;
     public boolean isStarted = false;
@@ -39,8 +47,6 @@ public class MainViewController extends AbstractController implements Initializa
     private Text focus_loser;
     @FXML
     private Text installUpdateApkTextField;
-    @FXML
-    public TextField destinationFolderPath;
     @FXML
     public TextField apkPickerTextBox;
     @FXML
@@ -67,6 +73,16 @@ public class MainViewController extends AbstractController implements Initializa
     private Button startApk;
     @FXML
     private Button closeApk;
+
+    //Destination path
+    @FXML
+    //if empty - will be catched before running anything that involves this field (or at least should be catched :P)
+    public TextField destinationFolderPath;
+    @FXML //checked - create new folder with date | unchecked - use destination folder
+    public CheckBox destinationFolderDate;
+    @FXML //checked - use default name | unchecked: File name -> (if empty) - log_date
+    public CheckBox destinationFileDefault;
+
     //Log Capture
     @FXML
     private ComboBox<String> logCaptureOutputFormat;
@@ -75,8 +91,11 @@ public class MainViewController extends AbstractController implements Initializa
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        //Read and set scrcpy location
-        this.scrcpyLocation = Scrcpy.getLocation();
+        //TODO: save and read checkboxes under destination folder + change all to config.json
+        addRegexps();
+        //Read and set last destination folder selection
+        destinationFolderPath.setText(getTextFromFile(destinationFolderTxtPath));
+        alignmentDoinger(destinationFolderPath);
         //Read and set log formats/filters
         logCaptureOutputFormat.setItems(getOutputFormat());
         logCaptureOutputFormat.getSelectionModel().selectFirst();
@@ -88,19 +107,26 @@ public class MainViewController extends AbstractController implements Initializa
 
     // -- LOG CAPTURE -- \\
 
+    //TODO: package filter: Selected package (checkbox)
+
     @FXML
-    public void dumpLogs() {
-        //todo: - whole backend
-        // isSelectedDeviceAvailable(){ --- }
-        new Thread(() -> {
-            LogCapture lc = new LogCapture(this);
-            lc.dumpLogs();
-        }).start();
+    public void dumpLogs() throws IOException {
+        if (isEligibleToStart(true, true)) {
+            new Thread(() -> {
+                LogCapture lc = new LogCapture(this);
+                try {
+                    lc.dumpLogs();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Platform.runLater(() -> showPopup(e.getMessage()));
+                }
+            }).start();
+        }
     }
 
     @FXML
     private void cleanLogs() {
-        if (isSelectedDeviceConnected()) {
+        if (isEligibleToStart(true, false)) {
             new Thread(() -> {
                 LogCapture lc = new LogCapture(this);
                 lc.cleanLogs();
@@ -121,7 +147,7 @@ public class MainViewController extends AbstractController implements Initializa
             return;
         }
 
-        if (!isSelectedDeviceConnected()) {
+        if (!isEligibleToStart(true, false)) {
             this.packageListComboBox.getItems().clear();
             Platform.runLater(() -> this.packageListComboBox.hide());
             loseFocus();
@@ -135,7 +161,7 @@ public class MainViewController extends AbstractController implements Initializa
 
     @FXML
     private void closeApk() {
-        if (isSelectedDeviceConnected()) {
+        if (isEligibleToStart(true, false)) {
             new Thread(() -> {
                 PackageManager pm = new PackageManager(this);
                 pm.closeApk();
@@ -145,7 +171,7 @@ public class MainViewController extends AbstractController implements Initializa
 
     @FXML
     private void uninstallApk() {
-        if (isSelectedDeviceConnected()) {
+        if (isEligibleToStart(true, false)) {
             new Thread(() -> {
                 PackageManager pm = new PackageManager(this);
                 try {
@@ -160,7 +186,7 @@ public class MainViewController extends AbstractController implements Initializa
 
     @FXML
     private void openApk() {
-        if (isSelectedDeviceConnected()) {
+        if (isEligibleToStart(true, false)) {
             new Thread(() -> {
                 PackageManager pm = new PackageManager(this);
                 try {
@@ -175,7 +201,7 @@ public class MainViewController extends AbstractController implements Initializa
 
     @FXML
     private void clearApkData() {
-        if (isSelectedDeviceConnected()) {
+        if (isEligibleToStart(true, false)) {
             new Thread(() -> {
                 PackageManager pm = new PackageManager(this);
                 try {
@@ -206,7 +232,7 @@ public class MainViewController extends AbstractController implements Initializa
         if (null == getDevice()) {
             showPopup("No device selected!");
         } else {
-            if (isSelectedDeviceConnected()) {
+            if (isEligibleToStart(true, false)) {
                 if (null == apkPath || apkPath.equals("")) {
                     showPopup("Missing apk file location!");
                 } else if (!apkPath.endsWith(".apk") && !apkPath.endsWith(".apex")) {
@@ -223,7 +249,7 @@ public class MainViewController extends AbstractController implements Initializa
     // -- DEVICE SECTION -- \\
 
     @FXML
-    private void refreshDevicesPress() {
+    public void refreshDevicesPress() {
         try {
             devices = getDevicesList();
         } catch (IOException e) {
@@ -235,8 +261,10 @@ public class MainViewController extends AbstractController implements Initializa
 
     @FXML
     private void scrcpyLaunch() {
-        if (isSelectedDeviceConnected()) {
-            if (null == getScrcpyLocation()) {
+        if (isEligibleToStart(true, false)) {
+            String pathStr = getScrcpyLocation();
+            Path path = Paths.get(pathStr);
+            if (!Files.isReadable(path) || pathStr.equals("")) {
                 showPopup("Missing scrcpy exe \n file location!");
             } else {
                 Scrcpy scrcpy = new Scrcpy(this);
@@ -247,23 +275,15 @@ public class MainViewController extends AbstractController implements Initializa
 
     @FXML
     private void scrcpyLocationSelector() {
-        this.scrcpyLocation = fileSelector("exe");
-        Scrcpy.saveLocation(this.scrcpyLocation);
+        scrcpyLocation = fileSelector("exe");
+        saveValueInTxt(scrcpyLocationStoredPath, scrcpyLocation);
     }
 
     // -- UTILITIES -- \\
 
-    public Boolean isSelectedDeviceConnected() {
-        try {
-            if (!isDeviceConnected(getDevice())) {
-                showPopup("Selected device has been disconnected");
-                refreshDevicesPress();
-                return false;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return true;
+    public Boolean isEligibleToStart(Boolean checkDevice, Boolean checkDestinationFolder) {
+        MainViewControllerTools mvct = new MainViewControllerTools(this);
+        return mvct.isEligibleToStart(checkDevice, checkDestinationFolder);
     }
 
     @FXML
@@ -274,6 +294,12 @@ public class MainViewController extends AbstractController implements Initializa
     public void showPopup(String text) {
         PopUpController popUpController = new PopUpController();
         popUpController.showPopupWindow(text);
+    }
+
+    public static DuplicateFileReturn showPopupDuplicateFile(String fileName) {
+        PopUpDuplicateFileController pdfc = new PopUpDuplicateFileController();
+        pdfc.showPopupWindow(fileName);
+        return new DuplicateFileReturn(pdfc.getFileNameString(), pdfc.getIsCanceled());
     }
 
     public void showLogsPopup() {
@@ -456,5 +482,14 @@ public class MainViewController extends AbstractController implements Initializa
             combo_box1.getSelectionModel().selectFirst();
             combo_box1.setDisable(true);
         }
+    }
+
+    public static String getDestinationFolderTxtPath() {
+        return destinationFolderTxtPath;
+    }
+
+    private void addRegexps(){
+        setRegexpForFileFolder(apkPickerTextBox);
+        setRegexpForFileFolder(logCaptureFileName);
     }
 }

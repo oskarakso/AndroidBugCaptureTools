@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -38,6 +39,7 @@ public class PopUpController extends AbstractController implements Initializable
     }
 
     //todo: Add dynamic text resize if out of label area (Utils.computeClippedText)
+    //todo: refactor
     public void showPopupWindow(String textToShow) {
         text = textToShow;
         FXMLLoader loader = new FXMLLoader();
@@ -53,18 +55,13 @@ public class PopUpController extends AbstractController implements Initializable
                 popupStage.initOwner(main.getPrimaryStage());
             }
             popupStage.setScene(scene);
-            double centerX = main.getPrimaryStage().getX() + main.getPrimaryStage().getWidth();
-            double centerY = main.getPrimaryStage().getY() + main.getPrimaryStage().getHeight();
-            popupStage.setOnShowing(ev -> popupStage.hide());
-            popupStage.setOnShown(ev -> {
-                popupStage.setX(centerX - popupStage.getWidth() / 0.578);
-                popupStage.setY(centerY - popupStage.getHeight() / 0.45);
-                popupStage.show();
-            });
+            centerStage(popupStage);
             popupStage.initModality(Modality.WINDOW_MODAL);
             popupStage.setTitle("ERROR");
             popupStage.initStyle(StageStyle.UNDECORATED);
             popupStage.setOpacity(0.85);
+            popupStage.getScene().setFill(Color.TRANSPARENT);
+            popupStage.initStyle(StageStyle.TRANSPARENT);
             popupStage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();

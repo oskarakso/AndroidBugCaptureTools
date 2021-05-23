@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -39,7 +40,7 @@ public class PopUpLogsController extends AbstractController implements Initializ
         });
         logsTextArea.setText(arrayToString(installationLogsText));
     }
-
+    //todo: refactor
     public void showPopupWindow(ArrayList<String> logs) {
         installationLogsText = logs;
         FXMLLoader loader = new FXMLLoader();
@@ -54,18 +55,13 @@ public class PopUpLogsController extends AbstractController implements Initializ
                 popupLogsStage.initOwner(main.getPrimaryStage());
             }
             popupLogsStage.setScene(scene);
-            double centerX = main.getPrimaryStage().getX() + main.getPrimaryStage().getWidth();
-            double centerY = main.getPrimaryStage().getY() + main.getPrimaryStage().getHeight();
-            popupLogsStage.setOnShowing(ev -> popupLogsStage.hide());
-            popupLogsStage.setOnShown(ev -> {
-                popupLogsStage.setX(centerX - popupLogsStage.getWidth() / 0.578);
-                popupLogsStage.setY(centerY - popupLogsStage.getHeight() / 0.45);
-                popupLogsStage.show();
-            });
+            centerStage(popupLogsStage);
             popupLogsStage.initModality(Modality.WINDOW_MODAL);
             popupLogsStage.setTitle("ERROR");
             popupLogsStage.initStyle(StageStyle.UNDECORATED);
             popupLogsStage.setOpacity(0.85);
+            popupLogsStage.getScene().setFill(Color.TRANSPARENT);
+            popupLogsStage.initStyle(StageStyle.TRANSPARENT);
             popupLogsStage.showAndWait();
 
         } catch (IOException e) {

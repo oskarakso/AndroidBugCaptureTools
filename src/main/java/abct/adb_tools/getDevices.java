@@ -80,7 +80,12 @@ public class getDevices {
                 output.append(line);
             }
         }
-        return output.toString().contains(id);
+        try {
+            return output.toString().contains(id);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }
