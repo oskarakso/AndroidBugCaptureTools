@@ -76,24 +76,28 @@ public class Main extends Application {
                 packageSectionCheck();
             }
         });
-        myControllerHandle.combo_box1.valueProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
-                packageSectionCheck();
+
+        myControllerHandle.combo_box1.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+            try {
+                if (!oldValue.equals(newValue) && newValue != null) {
+                    packageSectionCheck();
+                    resetInstallState();
+                }
+            } catch (NullPointerException ignored) {
             }
         });
 
         //alignment after change (by focus) on text-fields
-        myControllerHandle.destinationFolderPath.focusedProperty().addListener((obs, oldVal, newVal) -> {
-                    myControllerHandle.alignmentDoinger(myControllerHandle.destinationFolderPath);
-                }
-        );
+        myControllerHandle.destinationFolderPath.focusedProperty().addListener((obs, oldVal, newVal) ->
+                myControllerHandle.alignmentDoinger(myControllerHandle.destinationFolderPath));
 
         myControllerHandle.logCaptureFileName.focusedProperty().addListener((obs, oldVal, newVal) ->
                 myControllerHandle.alignmentDoinger(myControllerHandle.logCaptureFileName));
 
-        myControllerHandle.apkPickerTextBox.focusedProperty().addListener((obs, oldVal, newVal) ->
-                myControllerHandle.alignmentDoinger(myControllerHandle.apkPickerTextBox));
+        myControllerHandle.apkPickerTextBox.textProperty().addListener((obs, oldVal, newVal) -> {
+            myControllerHandle.alignmentDoinger(myControllerHandle.apkPickerTextBox);
+            resetInstallState();
+        });
 
         ///EXIT PLATFORM SECTION
         Platform.setImplicitExit(false);
@@ -117,6 +121,10 @@ public class Main extends Application {
             myControllerHandle.packageSectionDisable(false);
         else
             myControllerHandle.packageSectionDisable(true);
+    }
+
+    public void resetInstallState() {
+        myControllerHandle.setAs("new");
     }
 
     public Stage getPrimaryStage() {

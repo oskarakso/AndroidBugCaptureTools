@@ -22,13 +22,13 @@ public class InstallApk implements Runnable {
         String deviceID = mainViewController.getDevice();
         AtomicBoolean additionalLogs = new AtomicBoolean(false);
         if (path == null || deviceID == null) {
-            setAs("fail");
+            mainViewController.setAs("fail");
             return;
         }
         //adb -s deviceID install "path"
         String command = "adb -s " + deviceID + getInstallMode() + path + "\"";
 
-        setAs("start");
+        mainViewController.setAs("start");
 
         Process process = Runtime.getRuntime().exec(command);
         process.waitFor(3, TimeUnit.MINUTES);
@@ -36,9 +36,9 @@ public class InstallApk implements Runnable {
         ArrayList<String> processOutput = combineInputStreams(process.getInputStream(), process.getErrorStream());
         processOutput.forEach((n) -> {
             if (n.toLowerCase().contains("success")) {
-                setAs("pass");
+                mainViewController.setAs("pass");
             } else if (isFailedOnStart(n)) {
-                setAs("fail");
+                mainViewController.setAs("fail");
                 mainViewController.addLog(InstallationLogs.createFailedInstallLog(n, mainViewController.getDeviceIdName()));
                 additionalLogs.set(true);
             } else if (additionalLogs.get() && !(n.contains("com.android.server.pm"))) {
@@ -62,7 +62,7 @@ public class InstallApk implements Runnable {
         } catch (InterruptedException | IOException | NullPointerException e) {
             e.printStackTrace();
             System.out.println("Dropped new thread due to exception");
-            setAs("fail");
+            mainViewController.setAs("fail");
             return;
         }
         System.out.println("Dropped new thread");
@@ -73,29 +73,6 @@ public class InstallApk implements Runnable {
             return " install \"";
         } else {
             return " install -r \"";
-        }
-    }
-
-    public void setAs(String s) {
-        switch (s) {
-            case "start" -> {
-                mainViewController.apkInstall.setDisable(true);
-                mainViewController.apkInstallResult.setAlignment(Pos.CENTER_LEFT);
-                mainViewController.apkInstallResult.setText("Installing...");
-                mainViewController.apkInstallResult.setStyle("-fx-text-fill: white;");
-            }
-            case "fail" -> {
-                mainViewController.apkInstall.setDisable(false);
-                mainViewController.apkInstallResult.setAlignment(Pos.CENTER);
-                mainViewController.apkInstallResult.setText("Failed!");
-                mainViewController.apkInstallResult.setStyle("-fx-text-fill: red;");
-            }
-            case "pass" -> {
-                mainViewController.apkInstall.setDisable(false);
-                mainViewController.apkInstallResult.setAlignment(Pos.CENTER);
-                mainViewController.apkInstallResult.setText("Success!");
-                mainViewController.apkInstallResult.setStyle("-fx-text-fill: green;");
-            }
         }
     }
 }

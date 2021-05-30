@@ -488,8 +488,36 @@ public class MainViewController extends AbstractController implements Initializa
         return destinationFolderTxtPath;
     }
 
-    private void addRegexps(){
-        setRegexpForFileFolder(apkPickerTextBox);
+    private void addRegexps() {
         setRegexpForFileFolder(logCaptureFileName);
+    }
+
+    public void setAs(String s) {
+        switch (s) {
+            case "new" -> {
+                apkInstall.setDisable(false);
+                apkInstallResult.setAlignment(Pos.CENTER);
+                apkInstallResult.setText("Result");
+                apkInstallResult.setStyle("-fx-text-fill: white;");
+            }
+            case "start" -> {
+                apkInstall.setDisable(true);
+                apkInstallResult.setAlignment(Pos.CENTER_LEFT);
+                apkInstallResult.setText("Installing...");
+                apkInstallResult.setStyle("-fx-text-fill: white;");
+            }
+            case "fail" -> {
+                apkInstall.setDisable(false);
+                apkInstallResult.setAlignment(Pos.CENTER);
+                apkInstallResult.setText("Failed!");
+                apkInstallResult.setStyle("-fx-text-fill: red;");
+            }
+            case "pass" -> {
+                apkInstall.setDisable(false);
+                apkInstallResult.setAlignment(Pos.CENTER);
+                apkInstallResult.setText("Success!");
+                apkInstallResult.setStyle("-fx-text-fill: green;");
+            }
+        }
     }
 }
