@@ -100,7 +100,7 @@
          </font>
       </Text>
       <Button fx:id="apkInstall" layoutX="37.0" layoutY="263.0" mnemonicParsing="false" onAction="#apkInstall" prefHeight="27.0" prefWidth="67.0" stylesheets="@css/buttonNormal.css" text="Install" textAlignment="CENTER" />
-      <TextField fx:id="apkInstallResult" alignment="CENTER" editable="false" focusTraversable="false" layoutX="110.0" layoutY="264.0" onMouseClicked="#showInstallLog" onMousePressed="#showInstallLog" opacity="0.79" prefHeight="27.0" prefWidth="67.0" promptText="Result" stylesheets="@css/folderPickerTextBox.css">
+      <TextField fx:id="apkInstallResult" alignment="CENTER" editable="false" focusTraversable="false" layoutX="110.0" layoutY="264.0" onMouseClicked="#showInstallLog" onMousePressed="#showInstallLog" opacity="0.79" prefHeight="27.0" prefWidth="67.0" stylesheets="@css/apkInstallResult.css" text="status">
          <font>
             <Font name="Calibri" size="12.0" />
          </font>

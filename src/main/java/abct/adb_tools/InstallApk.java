@@ -20,13 +20,16 @@ public class InstallApk implements Runnable {
     private void install() throws InterruptedException, IOException {
         String path = mainViewController.getApkPath();
         String deviceID = mainViewController.getDevice();
+        String deviceIdName = mainViewController.getDeviceIdName();
+        String installMode = getInstallMode();
         AtomicBoolean additionalLogs = new AtomicBoolean(false);
         if (path == null || deviceID == null) {
             mainViewController.setAs("fail");
+            mainViewController.addLog("Something was null lol");
             return;
         }
         //adb -s deviceID install "path"
-        String command = "adb -s " + deviceID + getInstallMode() + path + "\"";
+        String command = "adb -s " + deviceID + installMode + path + "\"";
 
         mainViewController.setAs("start");
 
@@ -37,17 +40,18 @@ public class InstallApk implements Runnable {
         processOutput.forEach((n) -> {
             if (n.toLowerCase().contains("success")) {
                 mainViewController.setAs("pass");
+                mainViewController.addLog(InstallationLogs.createSuccessLog(deviceIdName, path, installMode));
             } else if (isFailedOnStart(n)) {
                 mainViewController.setAs("fail");
-                mainViewController.addLog(InstallationLogs.createFailedInstallLog(n, mainViewController.getDeviceIdName()));
+                mainViewController.addLog(InstallationLogs.createFailedInstallLog(n, deviceIdName));
                 additionalLogs.set(true);
             } else if (additionalLogs.get() && !(n.contains("com.android.server.pm"))) {
                 //com.android.server.pm - is just debug info that isn't necessary in this case
                 mainViewController.addLog(n);
             }
         });
-        //As there won't be any more logs from this installation - logs are separated by new line
-        mainViewController.addLog("\n");
+        //As there won't be any more logs from this installation - logs are separated by an empty row
+        mainViewController.addLog("");
     }
 
     private Boolean isFailedOnStart(String n) {

@@ -496,25 +496,22 @@ public class MainViewController extends AbstractController implements Initializa
         switch (s) {
             case "new" -> {
                 apkInstall.setDisable(false);
-                apkInstallResult.setAlignment(Pos.CENTER);
-                apkInstallResult.setText("Result");
+//                apkInstallResult.setAlignment(Pos.CENTER);
+                apkInstallResult.setText("status");
                 apkInstallResult.setStyle("-fx-text-fill: white;");
             }
             case "start" -> {
                 apkInstall.setDisable(true);
-                apkInstallResult.setAlignment(Pos.CENTER_LEFT);
-                apkInstallResult.setText("Installing...");
                 apkInstallResult.setStyle("-fx-text-fill: white;");
+                apkInstallResult.setText("Installing...");
             }
             case "fail" -> {
                 apkInstall.setDisable(false);
-                apkInstallResult.setAlignment(Pos.CENTER);
                 apkInstallResult.setText("Failed!");
                 apkInstallResult.setStyle("-fx-text-fill: red;");
             }
             case "pass" -> {
                 apkInstall.setDisable(false);
-                apkInstallResult.setAlignment(Pos.CENTER);
                 apkInstallResult.setText("Success!");
                 apkInstallResult.setStyle("-fx-text-fill: green;");
             }

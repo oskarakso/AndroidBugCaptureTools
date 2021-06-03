@@ -95,7 +95,7 @@ public class GlobalTools {
     }
 
     public static String getTimeDate() {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH:mm:ss");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
         return dtf.format(now).toString();
     }

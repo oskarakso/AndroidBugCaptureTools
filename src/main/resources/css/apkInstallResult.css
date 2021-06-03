@@ -1,0 +1,7 @@
+.text-field {
+    -fx-background-color:  #545454 ;
+    -fx-text-fill: white ;
+    -fx-font-family: "Calibri" ;
+	-fx-font-size: 14;
+	-fx-padding: 0 0 0 0;
+}
