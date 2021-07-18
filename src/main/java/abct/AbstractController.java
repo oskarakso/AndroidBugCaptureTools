@@ -1,9 +1,8 @@
 package abct;
 
 import javafx.beans.value.ChangeListener;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.scene.paint.Color;
+import javafx.stage.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +49,15 @@ public class AbstractController {
         }
         //but if adb exists - no matter what it returns - it will go here and boom works
         return true;
+    }
+
+    public void setUpPopUpStage(Stage stage){
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.setOpacity(0.85);
+        stage.getScene().setFill(Color.TRANSPARENT);
+        stage.initStyle(StageStyle.TRANSPARENT);
+        centerStage(stage);
+        stage.showAndWait();
     }
 
     public void centerStage(Stage stage) {

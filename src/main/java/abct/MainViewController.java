@@ -9,6 +9,7 @@ import abct.scrcpy.Scrcpy;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -155,8 +156,32 @@ public class MainViewController extends AbstractController implements Initializa
         }
 
         PackageManager pm = new PackageManager(this);
-        this.packageListComboBox.getItems().setAll(pm.getDevicePackages());
+        ObservableList<String> items = pm.getDevicePackages();
+        FilteredList<String> filteredItems = new FilteredList<String>(items, p -> true);
+        int caretPosition = this.packageListComboBox.getEditor().getCaretPosition();
+
+        packageListComboBox.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+            final TextField editor = this.packageListComboBox.getEditor();
+            final String selected = this.packageListComboBox.getSelectionModel().getSelectedItem();
+            //Running on gui as of this issue: https://bugs.openjdk.java.net/browse/JDK-8081700.
+            Platform.runLater(() -> {
+                if (selected == null || !selected.equals(editor.getText())) {
+                    filteredItems.setPredicate(item -> {
+                        if (item.toUpperCase().contains(newValue.toUpperCase())) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    });
+                }
+            });
+        });
+        this.packageListComboBox.setItems(filteredItems);
         this.packageListComboBox.setVisibleRowCount(Math.min(this.packageListComboBox.getItems().size(), 8));
+        String toRefreshValue = this.packageListComboBox.getEditor().getText(); // \/
+        this.packageListComboBox.getEditor().textProperty().set(" "); //  We need to somehow trigger textProperty listener - easiest way, .firevent() wasn't working in this case
+        this.packageListComboBox.getEditor().textProperty().set(toRefreshValue);
+        this.packageListComboBox.getEditor().positionCaret(caretPosition);
     }
 
     @FXML
@@ -492,11 +517,11 @@ public class MainViewController extends AbstractController implements Initializa
         setRegexpForFileFolder(logCaptureFileName);
     }
 
+
     public void setAs(String s) {
         switch (s) {
             case "new" -> {
                 apkInstall.setDisable(false);
-//                apkInstallResult.setAlignment(Pos.CENTER);
                 apkInstallResult.setText("status");
                 apkInstallResult.setStyle("-fx-text-fill: white;");
             }
@@ -504,6 +529,11 @@ public class MainViewController extends AbstractController implements Initializa
                 apkInstall.setDisable(true);
                 apkInstallResult.setStyle("-fx-text-fill: white;");
                 apkInstallResult.setText("Installing...");
+            }
+            case "start_update" -> {
+                apkInstall.setDisable(true);
+                apkInstallResult.setStyle("-fx-text-fill: white;");
+                apkInstallResult.setText("Updating...");
             }
             case "fail" -> {
                 apkInstall.setDisable(false);

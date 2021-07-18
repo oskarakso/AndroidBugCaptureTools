@@ -31,7 +31,9 @@ public class InstallApk implements Runnable {
         //adb -s deviceID install "path"
         String command = "adb -s " + deviceID + installMode + path + "\"";
 
-        mainViewController.setAs("start");
+        if (mainViewController.isInstallMode) {
+            mainViewController.setAs("start");
+        } else mainViewController.setAs("start_update");
 
         Process process = Runtime.getRuntime().exec(command);
         process.waitFor(3, TimeUnit.MINUTES);

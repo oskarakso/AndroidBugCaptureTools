@@ -1,5 +1,6 @@
 package abct;
 
+import javafx.beans.NamedArg;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,10 +18,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
+import static abct.MainViewController.installationLogs;
 import static abct.Utils.GlobalTools.arrayToString;
 
 public class PopUpLogsController extends AbstractController implements Initializable {
-    private Stage stage = null;
     private static ArrayList<String> installationLogsText = new ArrayList<String>();
 
     @FXML
@@ -39,42 +40,34 @@ public class PopUpLogsController extends AbstractController implements Initializ
             closeStage();
         });
         logsTextArea.setText(arrayToString(installationLogsText));
+        logsTextArea.selectPositionCaret(logsTextArea.getLength()); //Auto-scroll to newest logs
+        logsTextArea.deselect();
     }
-    //todo: refactor
+
     public void showPopupWindow(ArrayList<String> logs) {
         installationLogsText = logs;
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("/PopUpLogs.fxml"));
-        Parent layout;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/PopUpLogs.fxml"));
+        Stage popupLogsStage = new Stage(StageStyle.UNDECORATED);
         try {
-            layout = loader.load();
-            Scene scene = new Scene(layout);
-            Stage popupLogsStage = new Stage();
-            this.setStage(popupLogsStage);
-            if (main != null) {
-                popupLogsStage.initOwner(main.getPrimaryStage());
-            }
-            popupLogsStage.setScene(scene);
-            centerStage(popupLogsStage);
-            popupLogsStage.initModality(Modality.WINDOW_MODAL);
-            popupLogsStage.setTitle("ERROR");
-            popupLogsStage.initStyle(StageStyle.UNDECORATED);
-            popupLogsStage.setOpacity(0.85);
-            popupLogsStage.getScene().setFill(Color.TRANSPARENT);
-            popupLogsStage.initStyle(StageStyle.TRANSPARENT);
-            popupLogsStage.showAndWait();
-
+            popupLogsStage.setScene(new Scene(loader.load()));
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void setStage(Stage stage) {
-        this.stage = new Stage();
+        if (main != null) {
+            popupLogsStage.initOwner(main.getPrimaryStage());
+        }
+        setUpPopUpStage(popupLogsStage);
     }
 
     private void closeStage() {
         Stage stage = (Stage) returnButton.getScene().getWindow();
         stage.close();
+    }
+
+    @FXML
+    private void cleanLogs(){
+        installationLogs.clear();
+        installationLogsText.clear();
+        logsTextArea.setText("Cleaned!");
     }
 }

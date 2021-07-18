@@ -18,7 +18,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class PopUpController extends AbstractController implements Initializable {
-    private Stage stage = null;
     private static String text;
 
     @FXML
@@ -30,6 +29,7 @@ public class PopUpController extends AbstractController implements Initializable
     void returnAction(ActionEvent event) {
         closeStage();
     }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         textContent.setText(text);
@@ -38,38 +38,19 @@ public class PopUpController extends AbstractController implements Initializable
         });
     }
 
-    //todo: Add dynamic text resize if out of label area (Utils.computeClippedText)
-    //todo: refactor
     public void showPopupWindow(String textToShow) {
         text = textToShow;
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("/PopUp.fxml"));
-
-        Parent layout;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/PopUp.fxml"));
+        Stage popupLogsStage = new Stage(StageStyle.UNDECORATED);
         try {
-            layout = loader.load();
-            Scene scene = new Scene(layout);
-            Stage popupStage = new Stage();
-            this.setStage(popupStage);
-            if (main != null) {
-                popupStage.initOwner(main.getPrimaryStage());
-            }
-            popupStage.setScene(scene);
-            centerStage(popupStage);
-            popupStage.initModality(Modality.WINDOW_MODAL);
-            popupStage.setTitle("ERROR");
-            popupStage.initStyle(StageStyle.UNDECORATED);
-            popupStage.setOpacity(0.85);
-            popupStage.getScene().setFill(Color.TRANSPARENT);
-            popupStage.initStyle(StageStyle.TRANSPARENT);
-            popupStage.showAndWait();
+            popupLogsStage.setScene(new Scene(loader.load()));
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void setStage(Stage stage) {
-        this.stage = new Stage();
+        if (main != null) {
+            popupLogsStage.initOwner(main.getPrimaryStage());
+        }
+        setUpPopUpStage(popupLogsStage);
     }
 
     private void closeStage() {

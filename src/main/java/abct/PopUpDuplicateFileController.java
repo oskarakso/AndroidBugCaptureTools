@@ -59,13 +59,7 @@ public class PopUpDuplicateFileController extends AbstractController implements 
         }
         PopUpDuplicateFileController controller = loader.getController();
         controller.initData(fileNameStringIn);
-        stage.initModality(Modality.WINDOW_MODAL);
-        stage.setOpacity(0.85);
-        stage.getScene().setFill(Color.TRANSPARENT);
-        stage.initStyle(StageStyle.TRANSPARENT);
-        centerStage(stage);
-
-        stage.showAndWait();
+        setUpPopUpStage(stage);
     }
 
     private void closeStage() {

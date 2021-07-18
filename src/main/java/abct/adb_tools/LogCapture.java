@@ -56,6 +56,8 @@ public class LogCapture extends MainViewController {
         InputStream in = new BufferedInputStream(process.getInputStream());
         OutputStream out = new BufferedOutputStream(new FileOutputStream(outputPath)); //throws to main
 
+
+
         int cnt;
         byte[] buffer = new byte[1024];
         while ((cnt = in.read(buffer)) != -1) {

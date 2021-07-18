@@ -82,7 +82,7 @@ public class Main extends Application {
                 if (!oldValue.equals(newValue) && newValue != null) {
                     packageSectionCheck();
                     resetInstallState();
-                }
+                } //bug: Not working if there are two devices and one get disconnected - status is not cleared
             } catch (NullPointerException ignored) {
             }
         });
